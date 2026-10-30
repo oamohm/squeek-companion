@@ -47,10 +47,11 @@
             position: relative;
             width: 100vw;
             height: 100vh;
+            max-width: 480px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 10px;
+            padding: 8px;
             background: var(--bg-panel);
             border: 2px solid var(--primary);
             box-shadow: var(--border-glow);
@@ -61,7 +62,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 14px;
+            padding: 8px 12px;
             background: var(--bg-card);
             border: 1px solid var(--primary);
             border-radius: 6px;
@@ -71,16 +72,15 @@
         .branding-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .branding-avatar {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             background: #ffb703;
             border-radius: 50%;
             border: 2px solid var(--primary);
-            box-shadow: 0 0 8px #ffb703;
         }
 
         .branding-text {
@@ -89,13 +89,13 @@
         }
 
         .branding-text .main-title {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-bright);
-            text-shadow: 0 0 5px var(--primary);
+            text-shadow: 0 0 4px var(--primary);
         }
 
         .branding-text .sub-title {
-            font-size: 6px;
+            font-size: 5px;
             color: var(--text-muted);
             font-family: var(--font-mono);
             margin-top: 2px;
@@ -105,29 +105,22 @@
             background: linear-gradient(135deg, #ff007a, #990049);
             color: var(--text-bright);
             border: 1px solid #ff55a3;
-            padding: 8px 12px;
+            padding: 6px 10px;
             font-family: var(--font-pixel);
-            font-size: 8px;
+            font-size: 7px;
             cursor: pointer;
             border-radius: 4px;
-            box-shadow: 0 0 10px rgba(255, 0, 122, 0.4);
-            transition: transform 0.1s;
-        }
-
-        .btn-web3:active {
-            transform: scale(0.96);
         }
 
         .viewport-wrapper {
             position: relative;
             width: 100%;
             flex: 1 1 auto;
-            margin: 8px 0;
+            margin: 6px 0;
             background: #000000;
             border: 2px solid var(--primary);
             border-radius: 6px;
             overflow: hidden;
-            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
         }
 
         canvas#viewportCanvas {
@@ -142,14 +135,14 @@
             width: 100%;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
 
         .stat-card {
             background: var(--bg-card);
-            border: 1px solid rgba(0, 255, 204, 0.3);
-            padding: 8px 4px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            padding: 6px 4px;
             border-radius: 4px;
             text-align: center;
             display: flex;
@@ -158,15 +151,15 @@
         }
 
         .stat-card .label {
-            font-size: 6px;
+            font-size: 5px;
             color: var(--text-muted);
             font-family: var(--font-mono);
             text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .stat-card .val {
-            font-size: 9px;
+            font-size: 8px;
             color: var(--primary);
             font-family: var(--font-pixel);
             word-break: break-all;
@@ -175,10 +168,10 @@
         footer.arcade-footer {
             width: 100%;
             text-align: center;
-            font-size: 6px;
+            font-size: 5px;
             color: var(--text-muted);
             font-family: var(--font-mono);
-            margin-top: 6px;
+            margin-top: 4px;
             flex-shrink: 0;
         }
     </style>
@@ -191,7 +184,7 @@
                 <div class="branding-avatar"></div>
                 <div class="branding-text">
                     <span class="main-title">SQUEEKCHAIN</span>
-                    <span class="sub-title">WHEEL PROTOCOL RUNNER v3.0</span>
+                    <span class="sub-title">WHEEL RUNNER v3.0</span>
                 </div>
             </div>
             <button class="btn-web3" id="walletConnectBtn">CONNECT WALLET</button>
@@ -221,30 +214,19 @@
         </div>
 
         <footer class="arcade-footer">
-            DETERMINISTIC EXECUTION LAYER • TAP OR SPACE TO JUMP
+            DETERMINISTIC EXECUTION • TAP OR SPACE TO JUMP
         </footer>
     </div>
 
     <script>
-        /**
-         * ====================================================================
-         * SQUEEKCHAIN ENTERPRISE ARCADE ENGINE MODULES
-         * ====================================================================
-         */
-
-        // Module 1: Web Audio Synthesizer Engine
         class AudioEngine {
-            constructor() {
-                this.ctx = null;
-            }
+            constructor() { this.ctx = null; }
             init() {
                 if (!this.ctx) {
-                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioContextClass();
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AC();
                 }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
+                if (this.ctx.state === 'suspended') this.ctx.resume();
             }
             playTone(freq, type = 'sine', duration = 0.1, volume = 0.1) {
                 try {
@@ -261,43 +243,30 @@
                     osc.stop(this.ctx.currentTime + duration);
                 } catch (e) {}
             }
-            playJump() {
-                this.playTone(320, 'sine', 0.1, 0.08);
-                setTimeout(() => this.playTone(480, 'sine', 0.12, 0.06), 40);
-            }
-            playCoin() {
-                this.playTone(880, 'square', 0.08, 0.05);
-                setTimeout(() => this.playTone(1320, 'square', 0.12, 0.05), 50);
-            }
-            playHit() {
-                this.playTone(130, 'sawtooth', 0.2, 0.12);
-            }
-            playOver() {
-                this.playTone(300, 'sawtooth', 0.2, 0.1);
-                setTimeout(() => this.playTone(180, 'sawtooth', 0.3, 0.1), 150);
-            }
+            playJump() { this.playTone(350, 'sine', 0.1, 0.08); }
+            playCoin() { this.playTone(880, 'square', 0.08, 0.05); }
+            playHit() { this.playTone(120, 'sawtooth', 0.2, 0.12); }
+            playOver() { this.playTone(200, 'sawtooth', 0.3, 0.1); }
         }
 
-        // Module 2: Web3 Wallet & State Bridge
         class Web3Bridge {
-            constructor(callback) {
+            constructor(cb) {
                 this.address = null;
-                this.baseBalance = 1250;
-                this.callback = callback;
-                document.getElementById('walletConnectBtn').addEventListener('click', () => this.connectWallet());
+                this.cb = cb;
+                document.getElementById('walletConnectBtn').addEventListener('click', () => this.connect());
             }
-            async connectWallet() {
+            async connect() {
                 if (window.ethereum) {
                     try {
-                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        this.address = accounts[0];
+                        const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        this.address = accs[0];
                         this.updateUI();
-                        if (this.callback) this.callback();
+                        if (this.cb) this.cb();
                     } catch (e) {}
                 } else {
                     this.address = "0x" + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
                     this.updateUI();
-                    if (this.callback) this.callback();
+                    if (this.cb) this.cb();
                 }
             }
             updateUI() {
@@ -310,7 +279,6 @@
             }
         }
 
-        // Module 3: Core Game Canvas Engine
         class GameEngine {
             constructor() {
                 this.canvas = document.getElementById('viewportCanvas');
@@ -318,9 +286,9 @@
                 this.wrapper = document.getElementById('viewportWrapper');
 
                 this.audio = new AudioEngine();
-                this.web3 = new Web3Bridge(() => this.refreshHUD());
+                this.web3 = new Web3Bridge(() => this.syncHUD());
 
-                this.state = "START"; // START, PLAYING, GAMEOVER
+                this.state = "START";
                 this.distance = 0;
                 this.coins = 0;
                 this.energy = 100;
@@ -328,8 +296,13 @@
                 this.frame = 0;
                 this.wheelAngle = 0;
 
-                this.hamster = { x: 0, y: 0, vy: 0, radius: 12, grounded: true };
-                this.obstacles = [];
+                // Circular Track Physics Variables (Angle based on wheel)
+                this.hamsterAngle = Math.PI * 0.75; // Bottom left position on circle
+                this.hamsterVy = 0;
+                this.isJumping = false;
+                this.jumpHeightOffset = 0;
+
+                this.obstacles = []; // stored by angle on wheel
                 this.tokens = [];
                 this.particles = [];
 
@@ -342,25 +315,24 @@
             initListeners() {
                 window.addEventListener('resize', () => this.resize());
 
-                const triggerAction = (e) => {
+                const trigger = (e) => {
                     if (e.target.tagName === 'BUTTON') return;
                     if (e.type === 'touchstart') e.preventDefault();
-
                     this.audio.init();
 
                     if (this.state === "START" || this.state === "GAMEOVER") {
                         this.reset();
                         this.state = "PLAYING";
-                    } else if (this.state === "PLAYING" && this.hamster.grounded) {
-                        this.hamster.vy = -this.canvas.height * 0.022;
-                        this.hamster.grounded = false;
+                    } else if (this.state === "PLAYING" && !this.isJumping) {
+                        this.isJumping = true;
+                        this.hamsterVy = -9.5; // Controlled jump height inside wheel
                         this.audio.playJump();
                     }
                 };
 
-                window.addEventListener('keydown', (e) => { if (e.code === 'Space') triggerAction(e); });
-                this.wrapper.addEventListener('touchstart', triggerAction, { passive: false });
-                this.wrapper.addEventListener('click', triggerAction);
+                window.addEventListener('keydown', (e) => { if (e.code === 'Space') trigger(e); });
+                this.wrapper.addEventListener('touchstart', trigger, { passive: false });
+                this.wrapper.addEventListener('click', trigger);
             }
 
             resize() {
@@ -375,19 +347,19 @@
                 this.stage = 1;
                 this.frame = 0;
                 this.wheelAngle = 0;
-                this.hamster.vy = 0;
+                this.hamsterVy = 0;
+                this.jumpHeightOffset = 0;
+                this.isJumping = false;
                 this.obstacles = [];
                 this.tokens = [];
                 this.particles = [];
-                this.refreshHUD();
+                this.syncHUD();
             }
 
-            refreshHUD() {
+            syncHUD() {
                 document.getElementById('hudDist').innerText = `${Math.floor(this.distance)}m`;
                 document.getElementById('hudEnergy').innerText = `${Math.max(0, Math.floor(this.energy))}%`;
-                
-                const totalTokens = this.web3.baseBalance + (this.coins * 10);
-                document.getElementById('hudTokens').innerText = totalTokens;
+                document.getElementById('hudTokens').innerText = 1250 + (this.coins * 10);
 
                 if (this.distance < 100) {
                     this.stage = 1;
@@ -405,14 +377,14 @@
             }
 
             spawnFX(x, y, color) {
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 4; i++) {
                     this.particles.push({
                         x, y,
-                        vx: (Math.random() - 0.5) * 5,
-                        vy: (Math.random() - 0.5) * 5,
-                        radius: Math.random() * 3 + 1,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
+                        radius: 2,
                         color,
-                        life: 15
+                        life: 12
                     });
                 }
             }
@@ -421,72 +393,78 @@
                 if (this.state !== "PLAYING") return;
 
                 this.frame++;
-                this.distance += 0.12;
-                this.energy -= 0.022;
-                this.wheelAngle += 0.04 + (this.stage * 0.005);
+                this.distance += 0.1;
+                this.energy -= 0.02;
+                const rotationSpeed = 0.025 + (this.stage * 0.005);
+                this.wheelAngle += rotationSpeed;
 
                 if (this.energy <= 0) {
                     this.state = "GAMEOVER";
                     this.audio.playOver();
                 }
 
+                // Handle Jump strictly inside wheel bounds
+                if (this.isJumping) {
+                    this.jumpHeightOffset += this.hamsterVy;
+                    this.hamsterVy += 0.8; // gravity
+                    if (this.jumpHeightOffset >= 0) {
+                        this.jumpHeightOffset = 0;
+                        this.isJumping = false;
+                    }
+                }
+
+                // Spawn obstacles along the wheel track (angles)
+                if (this.frame % 100 === 0) {
+                    // Spawn at bottom right part of the track
+                    this.obstacles.push({ angle: Math.PI * 0.25 });
+                }
+                if (this.frame % 130 === 0) {
+                    this.tokens.push({ angle: Math.PI * 0.5 });
+                }
+
                 const cx = this.canvas.width / 2;
                 const cy = this.canvas.height / 2;
-                const radius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
-                const groundY = cy + radius - 16;
+                const radius = Math.min(this.canvas.width, this.canvas.height) * 0.42 - 12;
 
-                this.hamster.x = cx - (radius * 0.55);
-                this.hamster.vy += this.canvas.height * 0.001;
-                this.hamster.y += this.hamster.vy;
+                // Fixed hamster track angle (left side of wheel)
+                const hamsterTargetAngle = Math.PI * 0.75;
 
-                if (this.hamster.y >= groundY) {
-                    this.hamster.y = groundY;
-                    this.hamster.vy = 0;
-                    this.hamster.grounded = true;
-                }
-
-                const obsRate = Math.max(50, 90 - (this.stage * 10));
-                if (this.frame % obsRate === 0) {
-                    this.obstacles.push({ x: this.canvas.width + 20, size: 16 });
-                }
-                if (this.frame % 110 === 0) {
-                    this.tokens.push({ x: this.canvas.width + 20, y: groundY - 45 });
-                }
-
-                const speed = 3.2 + (this.stage * 0.5);
-
-                this.obstacles.forEach((obs, index) => {
-                    obs.x -= speed;
-                    if (Math.abs(obs.x - this.hamster.x) < 18 && this.hamster.y >= groundY - 8) {
-                        this.energy -= 18;
-                        this.audio.playHit();
-                        this.spawnFX(this.hamster.x, this.hamster.y, "#ff007a");
-                        this.obstacles.splice(index, 1);
+                // Move obstacles and check collision by angle
+                this.obstacles.forEach((obs, idx) => {
+                    obs.angle -= rotationSpeed;
+                    // Check if obstacle crosses hamster angle
+                    if (Math.abs(obs.angle - hamsterTargetAngle) < 0.12) {
+                        if (this.jumpHeightOffset > -15) { // Hit if not jumped high enough
+                            this.energy -= 15;
+                            this.audio.playHit();
+                            this.spawnFX(cx + Math.cos(hamsterTargetAngle) * radius, cy + Math.sin(hamsterTargetAngle) * radius, "#ff007a");
+                            this.obstacles.splice(idx, 1);
+                        }
                     }
                 });
 
-                this.tokens.forEach((coin, index) => {
-                    coin.x -= speed;
-                    if (Math.abs(coin.x - this.hamster.x) < 18 && Math.abs(coin.y - this.hamster.y) < 18) {
+                this.tokens.forEach((token, idx) => {
+                    token.angle -= rotationSpeed;
+                    if (Math.abs(token.angle - hamsterTargetAngle) < 0.12) {
                         this.coins++;
-                        this.energy = Math.min(100, this.energy + 12);
+                        this.energy = Math.min(100, this.energy + 10);
                         this.audio.playCoin();
-                        this.spawnFX(coin.x, coin.y, "#ffd700");
-                        this.tokens.splice(index, 1);
+                        this.spawnFX(cx + Math.cos(hamsterTargetAngle) * radius, cy + Math.sin(hamsterTargetAngle) * radius, "#ffd700");
+                        this.tokens.splice(idx, 1);
                     }
                 });
+
+                this.obstacles = this.obstacles.filter(o => o.angle > 0);
+                this.tokens = this.tokens.filter(t => t.angle > 0);
 
                 this.particles.forEach(p => {
                     p.x += p.vx;
                     p.y += p.vy;
                     p.life--;
                 });
-
-                this.obstacles = this.obstacles.filter(o => o.x > -30);
-                this.tokens = this.tokens.filter(c => c.x > -30);
                 this.particles = this.particles.filter(p => p.life > 0);
 
-                this.refreshHUD();
+                this.syncHUD();
             }
 
             draw() {
@@ -500,14 +478,14 @@
                 if (this.stage === 2) colorTheme = "#ffd700";
                 if (this.stage === 3) colorTheme = "#ff007a";
 
-                // Wheel Ring
+                // Outer Wheel Circle
                 this.ctx.strokeStyle = colorTheme;
                 this.ctx.lineWidth = 3;
                 this.ctx.beginPath();
                 this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
                 this.ctx.stroke();
 
-                // Wheel Spokes
+                // Spokes
                 for (let i = 0; i < 8; i++) {
                     let ang = this.wheelAngle + (i * Math.PI / 4);
                     this.ctx.strokeStyle = "rgba(22, 43, 66, 0.7)";
@@ -518,28 +496,35 @@
                     this.ctx.stroke();
                 }
 
-                // Track Arc
+                // Active Track Highlight Arc
                 this.ctx.strokeStyle = "#ff007a";
                 this.ctx.lineWidth = 4;
                 this.ctx.beginPath();
-                this.ctx.arc(cx, cy, radius - 6, 0.22 * Math.PI, 0.78 * Math.PI);
+                this.ctx.arc(cx, cy, radius - 4, 0.2 * Math.PI, 0.8 * Math.PI);
                 this.ctx.stroke();
 
-                const groundY = cy + radius - 16;
-
                 if (this.state === "PLAYING") {
+                    const trackRadius = radius - 10;
+
+                    // Draw Obstacles strictly inside the wheel track
                     this.ctx.fillStyle = "#ff0055";
                     this.obstacles.forEach(obs => {
-                        this.ctx.fillRect(obs.x, groundY - obs.size, obs.size, obs.size);
+                        let ox = cx + Math.cos(obs.angle) * trackRadius;
+                        let oy = cy + Math.sin(obs.angle) * trackRadius;
+                        this.ctx.fillRect(ox - 6, oy - 6, 12, 12);
                     });
 
+                    // Draw Tokens inside track
                     this.ctx.fillStyle = "#ffd700";
-                    this.tokens.forEach(c => {
+                    this.tokens.forEach(t => {
+                        let tx = cx + Math.cos(t.angle) * trackRadius;
+                        let ty = cy + Math.sin(t.angle) * trackRadius;
                         this.ctx.beginPath();
-                        this.ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
+                        this.ctx.arc(tx, ty, 5, 0, Math.PI * 2);
                         this.ctx.fill();
                     });
 
+                    // Particles
                     this.particles.forEach(p => {
                         this.ctx.fillStyle = p.color;
                         this.ctx.beginPath();
@@ -547,10 +532,17 @@
                         this.ctx.fill();
                     });
 
+                    // Hamster Position on Wheel (with jump offset)
+                    const hamsterAngle = Math.PI * 0.75;
+                    const currentRadius = trackRadius + this.jumpHeightOffset;
+                    let hx = cx + Math.cos(hamsterAngle) * currentRadius;
+                    let hy = cy + Math.sin(hamsterAngle) * currentRadius;
+
                     this.ctx.fillStyle = "#ffb703";
                     this.ctx.beginPath();
-                    this.ctx.arc(this.hamster.x, this.hamster.y, this.hamster.radius, 0, Math.PI * 2);
+                    this.ctx.arc(hx, hy, 10, 0, Math.PI * 2);
                     this.ctx.fill();
+
                 } else if (this.state === "START") {
                     this.ctx.fillStyle = "#ffffff";
                     this.ctx.font = "10px 'Press Start 2P'";
@@ -558,18 +550,18 @@
                     this.ctx.fillText("TAP TO START", cx, cy - 10);
 
                     this.ctx.fillStyle = colorTheme;
-                    this.ctx.font = "7px 'Press Start 2P'";
-                    this.ctx.fillText("RUN & MINT $SQK TOKENS", cx, cy + 15);
+                    this.ctx.font = "6px 'Press Start 2P'";
+                    this.ctx.fillText("RUN INSIDE WHEEL", cx, cy + 15);
                 } else if (this.state === "GAMEOVER") {
                     this.ctx.fillStyle = "#ff007a";
-                    this.ctx.font = "12px 'Press Start 2P'";
+                    this.ctx.font = "11px 'Press Start 2P'";
                     this.ctx.textAlign = "center";
-                    this.ctx.fillText("RUN OVER!", cx, cy - 20);
+                    this.ctx.fillText("RUN OVER!", cx, cy - 18);
 
                     this.ctx.fillStyle = "#ffffff";
-                    this.ctx.font = "7px 'Press Start 2P'";
-                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coins * 10} SQK`, cx, cy + 5);
-                    this.ctx.fillText("TAP TO RESTART", cx, cy + 25);
+                    this.ctx.font = "6px 'Press Start 2P'";
+                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coins * 10} SQK`, cx, cy + 4);
+                    this.ctx.fillText("TAP TO RESTART", cx, cy + 22);
                 }
             }
 
