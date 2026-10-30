@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Squeekchain Genesis Companion</title>
+    <title>Squeekchain Hamster Wheel</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -14,340 +14,97 @@
             padding: 0;
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            background-color: #03050a;
-            color: #00ffcc;
+        body {
+            background-color: #0d1117;
+            color: #58a6ff;
             font-family: 'Press Start 2P', monospace;
-            overflow: hidden;
-        }
-
-        .app-layout {
-            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-        }
-
-        header {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: #121b2d;
-            border: 2px solid #00ffcc;
-            border-radius: 6px;
-            flex-shrink: 0;
-        }
-
-        .title {
-            font-size: 10px;
-            color: #ffffff;
-        }
-
-        .btn-wallet {
-            background: #ff007a;
-            color: #ffffff;
-            border: none;
-            padding: 6px 10px;
-            font-family: inherit;
-            font-size: 8px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .game-viewport {
-            width: 100%;
-            max-width: 600px;
-            flex: 1 1 auto;
-            margin: 6px 0;
-            background: #000000;
-            border: 2px solid #1a2a40;
-            border-radius: 6px;
-            position: relative;
+            width: 100vw;
+            padding: 15px;
             overflow: hidden;
         }
 
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .container {
+            border: 2px solid #30363d;
+            background: #161b22;
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
             width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .dashboard {
-            width: 100%;
-            max-width: 600px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .stat-card {
-            background: #121b2d;
-            border: 1px solid #00ffcc33;
-            padding: 6px 4px;
-            border-radius: 4px;
+            max-width: 380px;
             text-align: center;
         }
 
-        .stat-label {
-            font-size: 6px;
-            color: #7d93ad;
-            margin-bottom: 2px;
+        h1 {
+            font-size: 14px;
+            color: #c9d1d9;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
-        .stat-value {
+        p {
+            color: #8b949e;
             font-size: 8px;
-            color: #00ffcc;
+            margin-bottom: 20px;
+        }
+
+        .counter-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3fb950;
+            margin: 20px 0;
+            text-shadow: 0 0 10px rgba(63, 185, 80, 0.3);
+        }
+
+        .btn-spin {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 10px;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(35, 134, 54, 0.4);
+            transition: transform 0.1s;
+        }
+
+        .btn-spin:active {
+            transform: scale(0.97);
+        }
+
+        .wallet-status {
+            margin-top: 15px;
+            font-size: 7px;
+            color: #ff007a;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-layout">
-        <header>
-            <div class="title">🐹 SQUEEK GENESIS</div>
-            <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">CONNECT WALLET</button>
-        </header>
-
-        <div class="game-viewport" id="viewport">
-            <canvas id="gameCanvas"></canvas>
-        </div>
-
-        <div class="dashboard">
-            <div class="stat-card">
-                <div class="stat-label">STAGE</div>
-                <div class="stat-value" id="uiStage">1: CYBER</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">BEST SCORE</div>
-                <div class="stat-value" id="uiBest">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">TOTAL $SQK</div>
-                <div class="stat-value" id="uiBalance">0 $SQK</div>
-            </div>
-        </div>
+    <div class="container">
+        <h1>Squeekchain Wheel</h1>
+        <p>Tap to spin and boost rotations</p>
+        <div class="counter-display" id="counter">1048</div>
+        <button class="btn-spin" onclick="spinWheel()">SPIN WHEEL 🐹</button>
+        <div class="wallet-status" id="walletText">Squeekchain Genesis Active</div>
     </div>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const viewport = document.getElementById("viewport");
+        let count = localStorage.getItem("sqk_rotations") ? parseInt(localStorage.getItem("sqk_rotations")) : 1048;
+        document.getElementById('counter').innerText = count;
 
-        function fitCanvasToViewport() {
-            canvas.width = viewport.clientWidth;
-            canvas.height = viewport.clientHeight;
+        function spinWheel() {
+            count += 1;
+            document.getElementById('counter').innerText = count;
+            localStorage.setItem("sqk_rotations", count);
         }
-
-        let gameState = "START";
-        let score = 0;
-        let stage = 1;
-        let earnedSqk = 0;
-
-        let bestScore = localStorage.getItem("sqk_bestScore") ? parseInt(localStorage.getItem("sqk_bestScore")) : 0;
-        let totalSqk = localStorage.getItem("sqk_totalCoins") ? parseInt(localStorage.getItem("sqk_totalCoins")) : 100;
-
-        let hamster = { x: 60, y: 150, vy: 0, radius: 12 };
-        let pipes = [];
-        let coins = [];
-        let frame = 0;
-
-        function updateUI() {
-            document.getElementById("uiBest").innerText = bestScore;
-            document.getElementById("uiBalance").innerText = (totalSqk + earnedSqk) + " $SQK";
-
-            if (score < 5) {
-                stage = 1;
-                document.getElementById("uiStage").innerText = "1: CYBER";
-            } else if (score < 15) {
-                stage = 2;
-                document.getElementById("uiStage").innerText = "2: WHEEL";
-            } else {
-                stage = 3;
-                document.getElementById("uiStage").innerText = "3: CORE";
-            }
-        }
-
-        function connectWallet() {
-            if (window.ethereum) {
-                window.ethereum.request({ method: 'eth_requestAccounts' }).then(accs => {
-                    let addr = accs[0];
-                    document.getElementById("walletBtn").innerText = addr.substring(0, 4) + "..." + addr.substring(38);
-                });
-            } else {
-                alert("Web3 Wallet Not Detected.");
-            }
-        }
-
-        function handleJump() {
-            if (gameState === "START" || gameState === "GAMEOVER") {
-                resetGame();
-                gameState = "PLAYING";
-            } else if (gameState === "PLAYING") {
-                hamster.vy = -5.2;
-            }
-        }
-
-        window.addEventListener("keydown", (e) => { if (e.code === "Space") handleJump(); });
-        viewport.addEventListener("touchstart", (e) => { e.preventDefault(); handleJump(); }, { passive: false });
-        viewport.addEventListener("click", handleJump);
-
-        function resetGame() {
-            score = 0;
-            earnedSqk = 0;
-            stage = 1;
-            hamster.y = canvas.height / 2;
-            hamster.vy = 0;
-            pipes = [];
-            coins = [];
-            frame = 0;
-            updateUI();
-        }
-
-        function update() {
-            if (gameState !== "PLAYING") return;
-
-            frame++;
-            hamster.vy += 0.28;
-            hamster.y += hamster.vy;
-
-            // Screen Top/Bottom Collision
-            if (hamster.y + hamster.radius >= canvas.height - 8 || hamster.y - hamster.radius <= 0) {
-                endGame();
-            }
-
-            let speed = stage === 1 ? 2.2 : (stage === 2 ? 2.8 : 3.4);
-            let spawnRate = stage === 1 ? 95 : (stage === 2 ? 80 : 65);
-
-            if (frame % spawnRate === 0) {
-                let gap = stage === 3 ? 100 : 120;
-                let topH = Math.floor(Math.random() * (canvas.height - gap - 60)) + 20;
-                pipes.push({ x: canvas.width, top: topH, bottom: topH + gap, passed: false });
-                coins.push({ x: canvas.width + 15, y: topH + (gap / 2), collected: false });
-            }
-
-            pipes.forEach(p => {
-                p.x -= speed;
-                if (hamster.x + hamster.radius > p.x && hamster.x - hamster.radius < p.x + 35) {
-                    if (hamster.y - hamster.radius < p.top || hamster.y + hamster.radius > p.bottom) {
-                        endGame();
-                    }
-                }
-                if (p.x + 35 < hamster.x && !p.passed) {
-                    score++;
-                    earnedSqk += 5;
-                    p.passed = true;
-                    if (score > bestScore) {
-                        bestScore = score;
-                        localStorage.setItem("sqk_bestScore", bestScore);
-                    }
-                    updateUI();
-                }
-            });
-
-            coins.forEach(c => {
-                c.x -= speed;
-                if (!c.collected && Math.abs(c.x - hamster.x) < 20 && Math.abs(c.y - hamster.y) < 20) {
-                    c.collected = true;
-                    earnedSqk += 10;
-                    updateUI();
-                }
-            });
-
-            pipes = pipes.filter(p => p.x > -40);
-            coins = coins.filter(c => c.x > -40);
-        }
-
-        function endGame() {
-            gameState = "GAMEOVER";
-            totalSqk += earnedSqk;
-            localStorage.setItem("sqk_totalCoins", totalSqk);
-            updateUI();
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            let bgColor = stage === 1 ? "#02040a" : (stage === 2 ? "#080614" : "#12030d");
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Floor Line
-            ctx.fillStyle = stage === 3 ? "#ff007a" : "#00ffcc";
-            ctx.fillRect(0, canvas.height - 8, canvas.width, 8);
-
-            if (gameState === "PLAYING" || gameState === "GAMEOVER") {
-                pipes.forEach(p => {
-                    ctx.fillStyle = stage === 3 ? "#00ffcc" : "#ff007a";
-                    ctx.fillRect(p.x, 0, 35, p.top);
-                    ctx.fillRect(p.x, p.bottom, 35, canvas.height - p.bottom - 8);
-                });
-
-                coins.forEach(c => {
-                    if (!c.collected) {
-                        ctx.fillStyle = "#ffd700";
-                        ctx.beginPath();
-                        ctx.arc(c.x, c.y, 7, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                });
-
-                ctx.fillStyle = "#ffb703";
-                ctx.beginPath();
-                ctx.arc(hamster.x, hamster.y, hamster.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "12px 'Press Start 2P'";
-                ctx.textAlign = "center";
-                ctx.fillText(score, canvas.width / 2, 30);
-            }
-
-            if (gameState === "START") {
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "10px 'Press Start 2P'";
-                ctx.textAlign = "center";
-                ctx.fillText("TAP TO START", canvas.width / 2, canvas.height / 2 - 10);
-                ctx.fillStyle = "#00ffcc";
-                ctx.font = "7px 'Press Start 2P'";
-                ctx.fillText("COLLECT $SQK TOKENS", canvas.width / 2, canvas.height / 2 + 15);
-            } else if (gameState === "GAMEOVER") {
-                ctx.fillStyle = "#ff007a";
-                ctx.font = "12px 'Press Start 2P'";
-                ctx.textAlign = "center";
-                ctx.fillText("RUN OVER", canvas.width / 2, canvas.height / 2 - 20);
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "8px 'Press Start 2P'";
-                ctx.fillText("SCORE: " + score, canvas.width / 2, canvas.height / 2 + 5);
-                ctx.fillText("EARNED: +" + earnedSqk + " $SQK", canvas.width / 2, canvas.height / 2 + 22);
-                ctx.fillText("TAP TO RESTART", canvas.width / 2, canvas.height / 2 + 45);
-            }
-        }
-
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
-
-        window.addEventListener('resize', () => {
-            fitCanvasToViewport();
-        });
-
-        fitCanvasToViewport();
-        updateUI();
-        loop();
     </script>
+
 </body>
 </html>
