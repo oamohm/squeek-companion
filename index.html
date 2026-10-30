@@ -14,29 +14,26 @@
             padding: 0;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            height: 100vh;
             background-color: #03050a;
             color: #00ffcc;
             font-family: 'Press Start 2P', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            width: 100vw;
-            padding: 8px;
             overflow: hidden;
         }
 
         .main-card {
             width: 100%;
-            max-width: 480px;
-            height: 96vh;
-            max-height: 850px;
+            max-width: 420px;
+            height: 100vh;
+            max-height: 750px;
             background: #090e1a;
             border: 2px solid #00ffcc;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.25);
+            padding: 8px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -46,38 +43,36 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 10px;
+            padding: 6px 8px;
             background: #121b2d;
             border: 1px solid #00ffcc;
-            border-radius: 6px;
+            border-radius: 4px;
             flex-shrink: 0;
         }
 
         .title {
-            font-size: 9px;
+            font-size: 8px;
             color: #ffffff;
-            text-shadow: 0 0 4px #00ffcc;
         }
 
         .btn-wallet {
             background: #ff007a;
             color: #ffffff;
             border: none;
-            padding: 6px 10px;
+            padding: 5px 8px;
             font-family: inherit;
-            font-size: 8px;
+            font-size: 7px;
             cursor: pointer;
             border-radius: 4px;
-            box-shadow: 0 0 6px rgba(255, 0, 122, 0.4);
         }
 
         .game-box {
             width: 100%;
             flex-grow: 1;
-            margin: 8px 0;
+            margin: 6px 0;
             background: #000000;
             border: 2px solid #1a2a40;
-            border-radius: 6px;
+            border-radius: 4px;
             position: relative;
             overflow: hidden;
         }
@@ -91,35 +86,43 @@
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
+            gap: 4px;
             flex-shrink: 0;
         }
 
         .stat-card {
             background: #121b2d;
             border: 1px solid #00ffcc33;
-            padding: 6px 4px;
+            padding: 5px 2px;
             border-radius: 4px;
             text-align: center;
         }
 
         .stat-label {
-            font-size: 6px;
+            font-size: 5px;
             color: #7d93ad;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .stat-value {
-            font-size: 8px;
+            font-size: 7px;
             color: #00ffcc;
         }
 
         footer {
-            font-size: 6px;
+            font-size: 5px;
             color: #5d738e;
             text-align: center;
-            margin-top: 4px;
+            margin-top: 2px;
             flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+            .main-card {
+                height: 85vh;
+                border-radius: 10px;
+                box-shadow: 0 0 20px rgba(0, 255, 204, 0.25);
+            }
         }
     </style>
 </head>
@@ -150,7 +153,7 @@
             </div>
         </div>
 
-        <footer>TAP / SPACE TO JUMP • PASS PIPES TO ADVANCE STAGES</footer>
+        <footer>TAP TO JUMP • PASS PIPES TO ADVANCE STAGES</footer>
     </div>
 
     <script>
@@ -168,11 +171,10 @@
         let stage = 1;
         let earnedSqk = 0;
 
-        // Permanent Local Storage Data
         let bestScore = localStorage.getItem("sqk_bestScore") ? parseInt(localStorage.getItem("sqk_bestScore")) : 0;
         let totalSqk = localStorage.getItem("sqk_totalCoins") ? parseInt(localStorage.getItem("sqk_totalCoins")) : 100;
 
-        let hamster = { x: 50, y: 150, vy: 0, radius: 11 };
+        let hamster = { x: 50, y: 150, vy: 0, radius: 10 };
         let pipes = [];
         let coins = [];
         let particles = [];
@@ -210,7 +212,7 @@
                 resetGame();
                 gameState = "PLAYING";
             } else if (gameState === "PLAYING") {
-                hamster.vy = -4.8;
+                hamster.vy = -4.5;
             }
         }
 
@@ -232,12 +234,12 @@
         }
 
         function spawnParticles(x, y) {
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 5; i++) {
                 particles.push({
                     x: x, y: y,
-                    vx: (Math.random() - 0.5) * 4,
-                    vy: (Math.random() - 0.5) * 4,
-                    life: 15
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    life: 12
                 });
             }
         }
@@ -246,33 +248,31 @@
             if (gameState !== "PLAYING") return;
 
             frame++;
-            hamster.vy += 0.28;
+            hamster.vy += 0.26;
             hamster.y += hamster.vy;
 
-            // Ground & Ceiling Collision
             if (hamster.y + hamster.radius >= canvas.height - 10 || hamster.y - hamster.radius <= 0) {
                 endGame();
             }
 
-            // Speed & Pipe Spawning Based on Stage
-            let speed = stage === 1 ? 2 : (stage === 2 ? 2.5 : 3.2);
-            let spawnRate = stage === 1 ? 95 : (stage === 2 ? 80 : 65);
+            let speed = stage === 1 ? 2 : (stage === 2 ? 2.4 : 3);
+            let spawnRate = stage === 1 ? 100 : (stage === 2 ? 85 : 70);
 
             if (frame % spawnRate === 0) {
                 let gap = stage === 3 ? 90 : 105;
-                let topH = Math.floor(Math.random() * (canvas.height - gap - 60)) + 20;
+                let topH = Math.floor(Math.random() * (canvas.height - gap - 50)) + 20;
                 pipes.push({ x: canvas.width, top: topH, bottom: topH + gap, passed: false });
                 coins.push({ x: canvas.width + 15, y: topH + (gap / 2), collected: false });
             }
 
             pipes.forEach(p => {
                 p.x -= speed;
-                if (hamster.x + hamster.radius > p.x && hamster.x - hamster.radius < p.x + 30) {
+                if (hamster.x + hamster.radius > p.x && hamster.x - hamster.radius < p.x + 28) {
                     if (hamster.y - hamster.radius < p.top || hamster.y + hamster.radius > p.bottom) {
                         endGame();
                     }
                 }
-                if (p.x + 30 < hamster.x && !p.passed) {
+                if (p.x + 28 < hamster.x && !p.passed) {
                     score++;
                     earnedSqk += 5;
                     p.passed = true;
@@ -286,7 +286,7 @@
 
             coins.forEach(c => {
                 c.x -= speed;
-                if (!c.collected && Math.abs(c.x - hamster.x) < 18 && Math.abs(c.y - hamster.y) < 18) {
+                if (!c.collected && Math.abs(c.x - hamster.x) < 16 && Math.abs(c.y - hamster.y) < 16) {
                     c.collected = true;
                     earnedSqk += 10;
                     spawnParticles(c.x, c.y);
@@ -294,15 +294,14 @@
                 }
             });
 
-            // Particles update
             particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
                 p.life--;
             });
 
-            pipes = pipes.filter(p => p.x > -35);
-            coins = coins.filter(c => c.x > -35);
+            pipes = pipes.filter(p => p.x > -30);
+            coins = coins.filter(c => c.x > -30);
             particles = particles.filter(p => p.life > 0);
         }
 
@@ -316,71 +315,64 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Stage-Based Background Color Shift
             let bgColor = stage === 1 ? "#02040a" : (stage === 2 ? "#080614" : "#12030d");
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Ground
             ctx.fillStyle = stage === 3 ? "#ff007a" : "#00ffcc";
             ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
 
             if (gameState === "PLAYING" || gameState === "GAMEOVER") {
-                // Pipes
                 pipes.forEach(p => {
                     ctx.fillStyle = stage === 3 ? "#00ffcc" : "#ff007a";
-                    ctx.fillRect(p.x, 0, 30, p.top);
-                    ctx.fillRect(p.x, p.bottom, 30, canvas.height - p.bottom - 10);
+                    ctx.fillRect(p.x, 0, 28, p.top);
+                    ctx.fillRect(p.x, p.bottom, 28, canvas.height - p.bottom - 10);
                 });
 
-                // Coins
                 coins.forEach(c => {
                     if (!c.collected) {
                         ctx.fillStyle = "#ffd700";
                         ctx.beginPath();
-                        ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
+                        ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
 
-                // Particles
                 particles.forEach(p => {
                     ctx.fillStyle = "#ffd700";
-                    ctx.fillRect(p.x, p.y, 3, 3);
+                    ctx.fillRect(p.x, p.y, 2, 2);
                 });
 
-                // Hamster
                 ctx.fillStyle = "#ffb703";
                 ctx.beginPath();
                 ctx.arc(hamster.x, hamster.y, hamster.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Score Display
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "12px 'Press Start 2P'";
+                ctx.font = "10px 'Press Start 2P'";
                 ctx.textAlign = "center";
-                ctx.fillText(score, canvas.width / 2, 30);
+                ctx.fillText(score, canvas.width / 2, 25);
             }
 
             if (gameState === "START") {
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "10px 'Press Start 2P'";
+                ctx.font = "9px 'Press Start 2P'";
                 ctx.textAlign = "center";
                 ctx.fillText("TAP TO START", canvas.width / 2, canvas.height / 2 - 10);
                 ctx.fillStyle = "#00ffcc";
-                ctx.font = "7px 'Press Start 2P'";
-                ctx.fillText("UNLOCK NEW STAGES & TOKENS", canvas.width / 2, canvas.height / 2 + 15);
+                ctx.font = "6px 'Press Start 2P'";
+                ctx.fillText("UNLOCK STAGES & TOKENS", canvas.width / 2, canvas.height / 2 + 12);
             } else if (gameState === "GAMEOVER") {
                 ctx.fillStyle = "#ff007a";
-                ctx.font = "12px 'Press Start 2P'";
+                ctx.font = "10px 'Press Start 2P'";
                 ctx.textAlign = "center";
-                ctx.fillText("RUN OVER", canvas.width / 2, canvas.height / 2 - 25);
+                ctx.fillText("RUN OVER", canvas.width / 2, canvas.height / 2 - 20);
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "8px 'Press Start 2P'";
+                ctx.font = "7px 'Press Start 2P'";
                 ctx.fillText("SCORE: " + score, canvas.width / 2, canvas.height / 2);
-                ctx.fillText("EARNED: +" + earnedSqk + " $SQK", canvas.width / 2, canvas.height / 2 + 18);
-                ctx.fillText("STAGE REACHED: " + stage, canvas.width / 2, canvas.height / 2 + 36);
-                ctx.fillText("TAP TO RESTART", canvas.width / 2, canvas.height / 2 + 58);
+                ctx.fillText("EARNED: +" + earnedSqk + " $SQK", canvas.width / 2, canvas.height / 2 + 15);
+                ctx.fillText("STAGE: " + stage, canvas.width / 2, canvas.height / 2 + 30);
+                ctx.fillText("TAP TO RESTART", canvas.width / 2, canvas.height / 2 + 50);
             }
         }
 
