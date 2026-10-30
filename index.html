@@ -9,16 +9,13 @@
 
         :root {
             --bg-base: #03060d;
-            --bg-panel: rgba(13, 22, 38, 0.95);
-            --bg-card: rgba(20, 32, 54, 0.95);
+            --bg-panel: #0d1626;
+            --bg-card: #142036;
             --primary: #00ffcc;
-            --primary-glow: rgba(0, 255, 204, 0.4);
             --secondary: #ff007a;
-            --secondary-glow: rgba(255, 0, 122, 0.4);
             --accent-gold: #ffd700;
             --text-bright: #ffffff;
             --text-muted: #8fa0b5;
-            --text-dark: #4a5c70;
             --border-glow: 0 0 15px rgba(0, 255, 204, 0.25);
             --font-pixel: 'Press Start 2P', monospace;
             --font-mono: 'Share Tech Mono', monospace;
@@ -35,7 +32,7 @@
         }
 
         html, body {
-            width: 100%;
+            width: 100vw;
             height: 100vh;
             background-color: var(--bg-base);
             color: var(--primary);
@@ -48,11 +45,8 @@
 
         .app-root {
             position: relative;
-            z-index: 2;
-            width: 100%;
+            width: 100vw;
             height: 100vh;
-            max-width: 480px;
-            max-height: 850px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -67,7 +61,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 10px;
+            padding: 10px 14px;
             background: var(--bg-card);
             border: 1px solid var(--primary);
             border-radius: 6px;
@@ -77,15 +71,16 @@
         .branding-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .branding-avatar {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             background: #ffb703;
             border-radius: 50%;
             border: 2px solid var(--primary);
+            box-shadow: 0 0 8px #ffb703;
         }
 
         .branding-text {
@@ -94,28 +89,33 @@
         }
 
         .branding-text .main-title {
-            font-size: 8px;
+            font-size: 10px;
             color: var(--text-bright);
-            text-shadow: 0 0 4px var(--primary);
+            text-shadow: 0 0 5px var(--primary);
         }
 
         .branding-text .sub-title {
-            font-size: 5px;
+            font-size: 6px;
             color: var(--text-muted);
             font-family: var(--font-mono);
-            margin-top: 1px;
+            margin-top: 2px;
         }
 
         .btn-web3 {
             background: linear-gradient(135deg, #ff007a, #990049);
             color: var(--text-bright);
             border: 1px solid #ff55a3;
-            padding: 6px 10px;
+            padding: 8px 12px;
             font-family: var(--font-pixel);
-            font-size: 7px;
+            font-size: 8px;
             cursor: pointer;
             border-radius: 4px;
-            box-shadow: var(--secondary-glow);
+            box-shadow: 0 0 10px rgba(255, 0, 122, 0.4);
+            transition: transform 0.1s;
+        }
+
+        .btn-web3:active {
+            transform: scale(0.96);
         }
 
         .viewport-wrapper {
@@ -127,7 +127,7 @@
             border: 2px solid var(--primary);
             border-radius: 6px;
             overflow: hidden;
-            min-height: 200px;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
         }
 
         canvas#viewportCanvas {
@@ -142,14 +142,14 @@
             width: 100%;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
+            gap: 8px;
             flex-shrink: 0;
         }
 
         .stat-card {
             background: var(--bg-card);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            padding: 6px 2px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 8px 4px;
             border-radius: 4px;
             text-align: center;
             display: flex;
@@ -158,15 +158,15 @@
         }
 
         .stat-card .label {
-            font-size: 5px;
+            font-size: 6px;
             color: var(--text-muted);
             font-family: var(--font-mono);
             text-transform: uppercase;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .stat-card .val {
-            font-size: 7px;
+            font-size: 9px;
             color: var(--primary);
             font-family: var(--font-pixel);
             word-break: break-all;
@@ -180,15 +180,6 @@
             font-family: var(--font-mono);
             margin-top: 6px;
             flex-shrink: 0;
-            line-height: 1.2;
-        }
-
-        @media (min-width: 768px) {
-            .app-root {
-                height: 90vh;
-                max-height: 750px;
-                border-radius: 12px;
-            }
         }
     </style>
 </head>
@@ -200,7 +191,7 @@
                 <div class="branding-avatar"></div>
                 <div class="branding-text">
                     <span class="main-title">SQUEEKCHAIN</span>
-                    <span class="sub-title">WHEEL RUNNER v3.0</span>
+                    <span class="sub-title">WHEEL PROTOCOL RUNNER v3.0</span>
                 </div>
             </div>
             <button class="btn-web3" id="walletConnectBtn">CONNECT WALLET</button>
@@ -225,34 +216,37 @@
             </div>
             <div class="stat-card">
                 <div class="label">$SQK TOKEN</div>
-                <div class="val" id="hudTokens" style="color: var(--accent-gold);">0</div>
+                <div class="val" id="hudTokens" style="color: var(--accent-gold);">1250</div>
             </div>
         </div>
 
         <footer class="arcade-footer">
-            DETERMINISTIC EXECUTION • TAP TO JUMP
+            DETERMINISTIC EXECUTION LAYER • TAP OR SPACE TO JUMP
         </footer>
     </div>
 
     <script>
+        /**
+         * ====================================================================
+         * SQUEEKCHAIN ENTERPRISE ARCADE ENGINE MODULES
+         * ====================================================================
+         */
+
+        // Module 1: Web Audio Synthesizer Engine
         class AudioEngine {
             constructor() {
                 this.ctx = null;
-                this.muted = false;
             }
-
             init() {
                 if (!this.ctx) {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioCtx();
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContextClass();
                 }
                 if (this.ctx.state === 'suspended') {
                     this.ctx.resume();
                 }
             }
-
             playTone(freq, type = 'sine', duration = 0.1, volume = 0.1) {
-                if (this.muted) return;
                 try {
                     this.init();
                     const osc = this.ctx.createOscillator();
@@ -267,154 +261,133 @@
                     osc.stop(this.ctx.currentTime + duration);
                 } catch (e) {}
             }
-
-            playJumpSound() {
-                this.playTone(350, 'sine', 0.12, 0.08);
-                setTimeout(() => this.playTone(520, 'sine', 0.15, 0.06), 40);
+            playJump() {
+                this.playTone(320, 'sine', 0.1, 0.08);
+                setTimeout(() => this.playTone(480, 'sine', 0.12, 0.06), 40);
             }
-
-            playCoinSound() {
+            playCoin() {
                 this.playTone(880, 'square', 0.08, 0.05);
-                setTimeout(() => this.playTone(1320, 'square', 0.12, 0.05), 60);
+                setTimeout(() => this.playTone(1320, 'square', 0.12, 0.05), 50);
             }
-
-            playHitSound() {
-                this.playTone(120, 'sawtooth', 0.25, 0.15);
+            playHit() {
+                this.playTone(130, 'sawtooth', 0.2, 0.12);
             }
-
-            playGameOverSound() {
+            playOver() {
                 this.playTone(300, 'sawtooth', 0.2, 0.1);
-                setTimeout(() => this.playTone(200, 'sawtooth', 0.2, 0.1), 150);
-                setTimeout(() => this.playTone(100, 'sawtooth', 0.4, 0.1), 300);
+                setTimeout(() => this.playTone(180, 'sawtooth', 0.3, 0.1), 150);
             }
         }
 
-        class Web3Connector {
-            constructor(uiCallback) {
+        // Module 2: Web3 Wallet & State Bridge
+        class Web3Bridge {
+            constructor(callback) {
                 this.address = null;
-                this.balance = 1250;
-                this.isConnected = false;
-                this.uiCallback = uiCallback;
-                this.initBtn();
+                this.baseBalance = 1250;
+                this.callback = callback;
+                document.getElementById('walletConnectBtn').addEventListener('click', () => this.connectWallet());
             }
-
-            initBtn() {
-                const btn = document.getElementById('walletConnectBtn');
-                btn.addEventListener('click', () => this.connect());
-            }
-
-            async connect() {
+            async connectWallet() {
                 if (window.ethereum) {
                     try {
-                        const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        this.address = accs[0];
-                        this.isConnected = true;
-                        this.updateBtn();
-                        if (this.uiCallback) this.uiCallback(this);
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        this.address = accounts[0];
+                        this.updateUI();
+                        if (this.callback) this.callback();
                     } catch (e) {}
                 } else {
                     this.address = "0x" + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
-                    this.isConnected = true;
-                    this.updateBtn();
-                    if (this.uiCallback) this.uiCallback(this);
+                    this.updateUI();
+                    if (this.callback) this.callback();
                 }
             }
-
-            updateBtn() {
-                const btn = document.getElementById('walletConnectBtn');
-                if (this.isConnected && this.address) {
+            updateUI() {
+                if (this.address) {
+                    const btn = document.getElementById('walletConnectBtn');
                     btn.innerText = `${this.address.substring(0, 4)}...${this.address.substring(38)}`;
                     btn.style.background = "linear-gradient(135deg, #00ffcc, #008866)";
-                    btn.style.color = "#000";
-                    btn.style.border = "1px solid #00ffcc";
+                    btn.style.color = "#03060d";
                 }
             }
         }
 
-        class SqueekGameEngine {
+        // Module 3: Core Game Canvas Engine
+        class GameEngine {
             constructor() {
                 this.canvas = document.getElementById('viewportCanvas');
                 this.ctx = this.canvas.getContext('2d');
                 this.wrapper = document.getElementById('viewportWrapper');
 
                 this.audio = new AudioEngine();
-                this.web3 = new Web3Connector(() => this.syncHUD());
+                this.web3 = new Web3Bridge(() => this.refreshHUD());
 
-                this.state = "START";
+                this.state = "START"; // START, PLAYING, GAMEOVER
                 this.distance = 0;
-                this.coinsCollected = 0;
+                this.coins = 0;
                 this.energy = 100;
                 this.stage = 1;
                 this.frame = 0;
                 this.wheelAngle = 0;
 
-                this.hamster = {
-                    x: 0,
-                    y: 0,
-                    vy: 0,
-                    radius: 11,
-                    grounded: true
-                };
-
+                this.hamster = { x: 0, y: 0, vy: 0, radius: 12, grounded: true };
                 this.obstacles = [];
-                this.coins = [];
+                this.tokens = [];
                 this.particles = [];
 
-                this.initEventListeners();
-                this.resizeCanvas();
+                this.initListeners();
+                this.resize();
                 this.loop = this.loop.bind(this);
-                requestAnimationFrame(loop => this.loop(loop));
+                requestAnimationFrame(this.loop);
             }
 
-            initEventListeners() {
-                window.addEventListener('resize', () => this.resizeCanvas());
+            initListeners() {
+                window.addEventListener('resize', () => this.resize());
 
-                const triggerJump = (e) => {
+                const triggerAction = (e) => {
                     if (e.target.tagName === 'BUTTON') return;
                     if (e.type === 'touchstart') e.preventDefault();
-                    
+
                     this.audio.init();
 
                     if (this.state === "START" || this.state === "GAMEOVER") {
-                        this.resetGame();
+                        this.reset();
                         this.state = "PLAYING";
                     } else if (this.state === "PLAYING" && this.hamster.grounded) {
-                        this.hamster.vy = -this.canvas.height * 0.021;
+                        this.hamster.vy = -this.canvas.height * 0.022;
                         this.hamster.grounded = false;
-                        this.audio.playJumpSound();
+                        this.audio.playJump();
                     }
                 };
 
-                window.addEventListener('keydown', (e) => { if (e.code === 'Space') triggerJump(e); });
-                this.wrapper.addEventListener('touchstart', triggerJump, { passive: false });
-                this.wrapper.addEventListener('click', triggerJump);
+                window.addEventListener('keydown', (e) => { if (e.code === 'Space') triggerAction(e); });
+                this.wrapper.addEventListener('touchstart', triggerAction, { passive: false });
+                this.wrapper.addEventListener('click', triggerAction);
             }
 
-            resizeCanvas() {
+            resize() {
                 this.canvas.width = this.wrapper.clientWidth;
                 this.canvas.height = this.wrapper.clientHeight;
             }
 
-            resetGame() {
+            reset() {
                 this.distance = 0;
-                this.coinsCollected = 0;
+                this.coins = 0;
                 this.energy = 100;
                 this.stage = 1;
                 this.frame = 0;
                 this.wheelAngle = 0;
                 this.hamster.vy = 0;
                 this.obstacles = [];
-                this.coins = [];
+                this.tokens = [];
                 this.particles = [];
-                this.syncHUD();
+                this.refreshHUD();
             }
 
-            syncHUD() {
+            refreshHUD() {
                 document.getElementById('hudDist').innerText = `${Math.floor(this.distance)}m`;
                 document.getElementById('hudEnergy').innerText = `${Math.max(0, Math.floor(this.energy))}%`;
                 
-                const totalSQK = (this.web3.balance + (this.coinsCollected * 10));
-                document.getElementById('hudTokens').innerText = totalSQK;
+                const totalTokens = this.web3.baseBalance + (this.coins * 10);
+                document.getElementById('hudTokens').innerText = totalTokens;
 
                 if (this.distance < 100) {
                     this.stage = 1;
@@ -431,16 +404,15 @@
                 }
             }
 
-            spawnParticles(x, y, color) {
+            spawnFX(x, y, color) {
                 for (let i = 0; i < 5; i++) {
                     this.particles.push({
-                        x: x,
-                        y: y,
-                        vx: (Math.random() - 0.5) * 4,
-                        vy: (Math.random() - 0.5) * 4,
-                        radius: Math.random() * 2.5 + 1,
-                        color: color,
-                        life: 18
+                        x, y,
+                        vx: (Math.random() - 0.5) * 5,
+                        vy: (Math.random() - 0.5) * 5,
+                        radius: Math.random() * 3 + 1,
+                        color,
+                        life: 15
                     });
                 }
             }
@@ -455,17 +427,16 @@
 
                 if (this.energy <= 0) {
                     this.state = "GAMEOVER";
-                    this.audio.playGameOverSound();
+                    this.audio.playOver();
                 }
 
-                const centerX = this.canvas.width / 2;
-                const centerY = this.canvas.height / 2;
-                const wheelRadius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
-                const groundY = centerY + wheelRadius - 14;
+                const cx = this.canvas.width / 2;
+                const cy = this.canvas.height / 2;
+                const radius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
+                const groundY = cy + radius - 16;
 
-                this.hamster.x = centerX - (wheelRadius * 0.55);
-
-                this.hamster.vy += this.canvas.height * 0.00095;
+                this.hamster.x = cx - (radius * 0.55);
+                this.hamster.vy += this.canvas.height * 0.001;
                 this.hamster.y += this.hamster.vy;
 
                 if (this.hamster.y >= groundY) {
@@ -474,91 +445,87 @@
                     this.hamster.grounded = true;
                 }
 
-                const obstacleInterval = Math.max(50, 90 - (this.stage * 10));
-                if (this.frame % obstacleInterval === 0) {
-                    this.obstacles.push({
-                        x: this.canvas.width + 20,
-                        size: 14 + Math.random() * 6
-                    });
+                const obsRate = Math.max(50, 90 - (this.stage * 10));
+                if (this.frame % obsRate === 0) {
+                    this.obstacles.push({ x: this.canvas.width + 20, size: 16 });
+                }
+                if (this.frame % 110 === 0) {
+                    this.tokens.push({ x: this.canvas.width + 20, y: groundY - 45 });
                 }
 
-                if (this.frame % 105 === 0) {
-                    this.coins.push({
-                        x: this.canvas.width + 20,
-                        y: groundY - (Math.random() * 45 + 20)
-                    });
-                }
+                const speed = 3.2 + (this.stage * 0.5);
 
-                const moveSpeed = 3.2 + (this.stage * 0.5);
-
-                this.obstacles.forEach((obs, idx) => {
-                    obs.x -= moveSpeed;
-                    if (Math.abs(obs.x - this.hamster.x) < 16 && this.hamster.y >= groundY - 8) {
+                this.obstacles.forEach((obs, index) => {
+                    obs.x -= speed;
+                    if (Math.abs(obs.x - this.hamster.x) < 18 && this.hamster.y >= groundY - 8) {
                         this.energy -= 18;
-                        this.audio.playHitSound();
-                        this.spawnParticles(this.hamster.x, this.hamster.y, "#ff007a");
-                        this.obstacles.splice(idx, 1);
+                        this.audio.playHit();
+                        this.spawnFX(this.hamster.x, this.hamster.y, "#ff007a");
+                        this.obstacles.splice(index, 1);
                     }
                 });
 
-                this.coins.forEach((coin, idx) => {
-                    coin.x -= moveSpeed;
+                this.tokens.forEach((coin, index) => {
+                    coin.x -= speed;
                     if (Math.abs(coin.x - this.hamster.x) < 18 && Math.abs(coin.y - this.hamster.y) < 18) {
-                        this.coinsCollected++;
-                        this.energy = Math.min(100, this.energy + 10);
-                        this.audio.playCoinSound();
-                        this.spawnParticles(coin.x, coin.y, "#ffd700");
-                        this.coins.splice(idx, 1);
+                        this.coins++;
+                        this.energy = Math.min(100, this.energy + 12);
+                        this.audio.playCoin();
+                        this.spawnFX(coin.x, coin.y, "#ffd700");
+                        this.tokens.splice(index, 1);
                     }
                 });
 
-                this.particles.forEach((p) => {
+                this.particles.forEach(p => {
                     p.x += p.vx;
                     p.y += p.vy;
                     p.life--;
                 });
 
                 this.obstacles = this.obstacles.filter(o => o.x > -30);
-                this.coins = this.coins.filter(c => c.x > -30);
+                this.tokens = this.tokens.filter(c => c.x > -30);
                 this.particles = this.particles.filter(p => p.life > 0);
 
-                this.syncHUD();
+                this.refreshHUD();
             }
 
             draw() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-                const centerX = this.canvas.width / 2;
-                const centerY = this.canvas.height / 2;
-                const wheelRadius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
+                const cx = this.canvas.width / 2;
+                const cy = this.canvas.height / 2;
+                const radius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
 
-                let themeColor = "#00ffcc";
-                if (this.stage === 2) themeColor = "#ffd700";
-                if (this.stage === 3) themeColor = "#ff007a";
+                let colorTheme = "#00ffcc";
+                if (this.stage === 2) colorTheme = "#ffd700";
+                if (this.stage === 3) colorTheme = "#ff007a";
 
-                this.ctx.strokeStyle = themeColor;
+                // Wheel Ring
+                this.ctx.strokeStyle = colorTheme;
                 this.ctx.lineWidth = 3;
                 this.ctx.beginPath();
-                this.ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
+                this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
                 this.ctx.stroke();
 
+                // Wheel Spokes
                 for (let i = 0; i < 8; i++) {
                     let ang = this.wheelAngle + (i * Math.PI / 4);
-                    this.ctx.strokeStyle = "rgba(22, 43, 66, 0.6)";
+                    this.ctx.strokeStyle = "rgba(22, 43, 66, 0.7)";
                     this.ctx.lineWidth = 2;
                     this.ctx.beginPath();
-                    this.ctx.moveTo(centerX, centerY);
-                    this.ctx.lineTo(centerX + Math.cos(ang) * wheelRadius, centerY + Math.sin(ang) * wheelRadius);
+                    this.ctx.moveTo(cx, cy);
+                    this.ctx.lineTo(cx + Math.cos(ang) * radius, cy + Math.sin(ang) * radius);
                     this.ctx.stroke();
                 }
 
+                // Track Arc
                 this.ctx.strokeStyle = "#ff007a";
                 this.ctx.lineWidth = 4;
                 this.ctx.beginPath();
-                this.ctx.arc(centerX, centerY, wheelRadius - 5, 0.22 * Math.PI, 0.78 * Math.PI);
+                this.ctx.arc(cx, cy, radius - 6, 0.22 * Math.PI, 0.78 * Math.PI);
                 this.ctx.stroke();
 
-                const groundY = centerY + wheelRadius - 14;
+                const groundY = cy + radius - 16;
 
                 if (this.state === "PLAYING") {
                     this.ctx.fillStyle = "#ff0055";
@@ -567,9 +534,9 @@
                     });
 
                     this.ctx.fillStyle = "#ffd700";
-                    this.coins.forEach(c => {
+                    this.tokens.forEach(c => {
                         this.ctx.beginPath();
-                        this.ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
+                        this.ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
                         this.ctx.fill();
                     });
 
@@ -584,43 +551,37 @@
                     this.ctx.beginPath();
                     this.ctx.arc(this.hamster.x, this.hamster.y, this.hamster.radius, 0, Math.PI * 2);
                     this.ctx.fill();
-
-                    this.ctx.fillStyle = "#fb8500";
-                    this.ctx.beginPath();
-                    this.ctx.arc(this.hamster.x - 3, this.hamster.y - 8, 2.5, 0, Math.PI * 2);
-                    this.ctx.arc(this.hamster.x + 3, this.hamster.y - 8, 2.5, 0, Math.PI * 2);
-                    this.ctx.fill();
                 } else if (this.state === "START") {
                     this.ctx.fillStyle = "#ffffff";
-                    this.ctx.font = "9px 'Press Start 2P'";
+                    this.ctx.font = "10px 'Press Start 2P'";
                     this.ctx.textAlign = "center";
-                    this.ctx.fillText("TAP TO START", centerX, centerY - 10);
+                    this.ctx.fillText("TAP TO START", cx, cy - 10);
 
-                    this.ctx.fillStyle = themeColor;
-                    this.ctx.font = "6px 'Press Start 2P'";
-                    this.ctx.fillText("RUN & MINT $SQK TOKENS", centerX, centerY + 14);
+                    this.ctx.fillStyle = colorTheme;
+                    this.ctx.font = "7px 'Press Start 2P'";
+                    this.ctx.fillText("RUN & MINT $SQK TOKENS", cx, cy + 15);
                 } else if (this.state === "GAMEOVER") {
                     this.ctx.fillStyle = "#ff007a";
-                    this.ctx.font = "11px 'Press Start 2P'";
+                    this.ctx.font = "12px 'Press Start 2P'";
                     this.ctx.textAlign = "center";
-                    this.ctx.fillText("RUN OVER!", centerX, centerY - 18);
+                    this.ctx.fillText("RUN OVER!", cx, cy - 20);
 
                     this.ctx.fillStyle = "#ffffff";
-                    this.ctx.font = "6px 'Press Start 2P'";
-                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coinsCollected * 10} SQK`, centerX, centerY + 4);
-                    this.ctx.fillText("TAP TO RESTART", centerX, centerY + 22);
+                    this.ctx.font = "7px 'Press Start 2P'";
+                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coins * 10} SQK`, cx, cy + 5);
+                    this.ctx.fillText("TAP TO RESTART", cx, cy + 25);
                 }
             }
 
             loop() {
                 this.update();
                 this.draw();
-                requestAnimationFrame(() => this.loop());
+                requestAnimationFrame(this.loop);
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            window.gameInstance = new SqueekGameEngine();
+            window.appEngine = new GameEngine();
         });
     </script>
 </body>
