@@ -47,11 +47,12 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            max-width: 480px;
+            max-width: 500px;
+            max-height: 850px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 8px;
+            padding: 10px;
             background: var(--bg-panel);
             border: 2px solid var(--primary);
             box-shadow: var(--border-glow);
@@ -121,6 +122,9 @@
             border: 2px solid var(--primary);
             border-radius: 6px;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         canvas#viewportCanvas {
@@ -173,6 +177,13 @@
             font-family: var(--font-mono);
             margin-top: 4px;
             flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+            .app-root {
+                height: 90vh;
+                border-radius: 10px;
+            }
         }
     </style>
 </head>
@@ -296,15 +307,13 @@
                 this.frame = 0;
                 this.wheelAngle = 0;
 
-                // Circular Track Physics Variables (Angle based on wheel)
-                this.hamsterAngle = Math.PI * 0.75; // Bottom left position on circle
-                this.hamsterVy = 0;
+                // Physics Controls for Inner Wheel Movement
+                this.jumpOffset = 0;
+                this.jumpVy = 0;
                 this.isJumping = false;
-                this.jumpHeightOffset = 0;
 
-                this.obstacles = []; // stored by angle on wheel
+                this.obstacles = [];
                 this.tokens = [];
-                this.particles = [];
 
                 this.initListeners();
                 this.resize();
@@ -325,7 +334,7 @@
                         this.state = "PLAYING";
                     } else if (this.state === "PLAYING" && !this.isJumping) {
                         this.isJumping = true;
-                        this.hamsterVy = -9.5; // Controlled jump height inside wheel
+                        this.jumpVy = 3.8; // Constrained Height Jump Inside Circle
                         this.audio.playJump();
                     }
                 };
@@ -347,12 +356,11 @@
                 this.stage = 1;
                 this.frame = 0;
                 this.wheelAngle = 0;
-                this.hamsterVy = 0;
-                this.jumpHeightOffset = 0;
+                this.jumpOffset = 0;
+                this.jumpVy = 0;
                 this.isJumping = false;
                 this.obstacles = [];
                 this.tokens = [];
-                this.particles = [];
                 this.syncHUD();
             }
 
@@ -376,26 +384,13 @@
                 }
             }
 
-            spawnFX(x, y, color) {
-                for (let i = 0; i < 4; i++) {
-                    this.particles.push({
-                        x, y,
-                        vx: (Math.random() - 0.5) * 4,
-                        vy: (Math.random() - 0.5) * 4,
-                        radius: 2,
-                        color,
-                        life: 12
-                    });
-                }
-            }
-
             update() {
                 if (this.state !== "PLAYING") return;
 
                 this.frame++;
-                this.distance += 0.1;
-                this.energy -= 0.02;
-                const rotationSpeed = 0.025 + (this.stage * 0.005);
+                this.distance += 0.12;
+                this.energy -= 0.022;
+                const rotationSpeed = 0.022 + (this.stage * 0.004);
                 this.wheelAngle += rotationSpeed;
 
                 if (this.energy <= 0) {
@@ -403,41 +398,33 @@
                     this.audio.playOver();
                 }
 
-                // Handle Jump strictly inside wheel bounds
+                // Smooth Jump Gravity bounded inside track
                 if (this.isJumping) {
-                    this.jumpHeightOffset += this.hamsterVy;
-                    this.hamsterVy += 0.8; // gravity
-                    if (this.jumpHeightOffset >= 0) {
-                        this.jumpHeightOffset = 0;
+                    this.jumpOffset += this.jumpVy;
+                    this.jumpVy -= 0.28;
+                    if (this.jumpOffset <= 0) {
+                        this.jumpOffset = 0;
                         this.isJumping = false;
                     }
                 }
 
-                // Spawn obstacles along the wheel track (angles)
-                if (this.frame % 100 === 0) {
-                    // Spawn at bottom right part of the track
-                    this.obstacles.push({ angle: Math.PI * 0.25 });
+                // Obstacle & Token Spawners strictly on angle
+                if (this.frame % 110 === 0) {
+                    this.obstacles.push({ angle: Math.PI * 0.2 });
                 }
-                if (this.frame % 130 === 0) {
-                    this.tokens.push({ angle: Math.PI * 0.5 });
+                if (this.frame % 140 === 0) {
+                    this.tokens.push({ angle: Math.PI * 0.3 });
                 }
 
-                const cx = this.canvas.width / 2;
-                const cy = this.canvas.height / 2;
-                const radius = Math.min(this.canvas.width, this.canvas.height) * 0.42 - 12;
+                const hamsterTargetAngle = Math.PI * 0.72; // Track angle for runner
 
-                // Fixed hamster track angle (left side of wheel)
-                const hamsterTargetAngle = Math.PI * 0.75;
-
-                // Move obstacles and check collision by angle
+                // Collision Detection on track
                 this.obstacles.forEach((obs, idx) => {
                     obs.angle -= rotationSpeed;
-                    // Check if obstacle crosses hamster angle
-                    if (Math.abs(obs.angle - hamsterTargetAngle) < 0.12) {
-                        if (this.jumpHeightOffset > -15) { // Hit if not jumped high enough
-                            this.energy -= 15;
+                    if (Math.abs(obs.angle - hamsterTargetAngle) < 0.08) {
+                        if (this.jumpOffset < 10) {
+                            this.energy -= 16;
                             this.audio.playHit();
-                            this.spawnFX(cx + Math.cos(hamsterTargetAngle) * radius, cy + Math.sin(hamsterTargetAngle) * radius, "#ff007a");
                             this.obstacles.splice(idx, 1);
                         }
                     }
@@ -445,24 +432,16 @@
 
                 this.tokens.forEach((token, idx) => {
                     token.angle -= rotationSpeed;
-                    if (Math.abs(token.angle - hamsterTargetAngle) < 0.12) {
+                    if (Math.abs(token.angle - hamsterTargetAngle) < 0.08) {
                         this.coins++;
                         this.energy = Math.min(100, this.energy + 10);
                         this.audio.playCoin();
-                        this.spawnFX(cx + Math.cos(hamsterTargetAngle) * radius, cy + Math.sin(hamsterTargetAngle) * radius, "#ffd700");
                         this.tokens.splice(idx, 1);
                     }
                 });
 
                 this.obstacles = this.obstacles.filter(o => o.angle > 0);
                 this.tokens = this.tokens.filter(t => t.angle > 0);
-
-                this.particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.life--;
-                });
-                this.particles = this.particles.filter(p => p.life > 0);
 
                 this.syncHUD();
             }
@@ -478,25 +457,25 @@
                 if (this.stage === 2) colorTheme = "#ffd700";
                 if (this.stage === 3) colorTheme = "#ff007a";
 
-                // Outer Wheel Circle
+                // Main Wheel Outer Boundary
                 this.ctx.strokeStyle = colorTheme;
                 this.ctx.lineWidth = 3;
                 this.ctx.beginPath();
                 this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
                 this.ctx.stroke();
 
-                // Spokes
+                // Inner Wheel Spokes
                 for (let i = 0; i < 8; i++) {
                     let ang = this.wheelAngle + (i * Math.PI / 4);
-                    this.ctx.strokeStyle = "rgba(22, 43, 66, 0.7)";
-                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = "rgba(22, 43, 66, 0.6)";
+                    this.ctx.lineWidth = 1.5;
                     this.ctx.beginPath();
                     this.ctx.moveTo(cx, cy);
                     this.ctx.lineTo(cx + Math.cos(ang) * radius, cy + Math.sin(ang) * radius);
                     this.ctx.stroke();
                 }
 
-                // Active Track Highlight Arc
+                // Bottom Running Arc Highlight
                 this.ctx.strokeStyle = "#ff007a";
                 this.ctx.lineWidth = 4;
                 this.ctx.beginPath();
@@ -504,9 +483,9 @@
                 this.ctx.stroke();
 
                 if (this.state === "PLAYING") {
-                    const trackRadius = radius - 10;
+                    const trackRadius = radius - 12;
 
-                    // Draw Obstacles strictly inside the wheel track
+                    // Obstacles strictly on arc
                     this.ctx.fillStyle = "#ff0055";
                     this.obstacles.forEach(obs => {
                         let ox = cx + Math.cos(obs.angle) * trackRadius;
@@ -514,7 +493,7 @@
                         this.ctx.fillRect(ox - 6, oy - 6, 12, 12);
                     });
 
-                    // Draw Tokens inside track
+                    // Tokens strictly on arc
                     this.ctx.fillStyle = "#ffd700";
                     this.tokens.forEach(t => {
                         let tx = cx + Math.cos(t.angle) * trackRadius;
@@ -524,17 +503,9 @@
                         this.ctx.fill();
                     });
 
-                    // Particles
-                    this.particles.forEach(p => {
-                        this.ctx.fillStyle = p.color;
-                        this.ctx.beginPath();
-                        this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        this.ctx.fill();
-                    });
-
-                    // Hamster Position on Wheel (with jump offset)
-                    const hamsterAngle = Math.PI * 0.75;
-                    const currentRadius = trackRadius + this.jumpHeightOffset;
+                    // Hamster Runner (Strictly bounded inside the track)
+                    const hamsterAngle = Math.PI * 0.72;
+                    const currentRadius = trackRadius - this.jumpOffset;
                     let hx = cx + Math.cos(hamsterAngle) * currentRadius;
                     let hy = cy + Math.sin(hamsterAngle) * currentRadius;
 
