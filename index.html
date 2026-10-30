@@ -19,24 +19,24 @@
             overflow: hidden;
         }
         .game-container {
-            width: 100%;
-            max-width: 400px;
-            height: 80vh;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             background: #0d1626;
             border: 2px solid #00ffcc;
-            border-radius: 8px;
-            padding: 10px;
+            padding: 8px;
         }
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px;
-            font-size: 10px;
+            padding: 6px 10px;
+            font-size: 11px;
             border-bottom: 1px solid #1f3552;
-            margin-bottom: 8px;
+            background: #142036;
+            border-radius: 4px;
+            margin-bottom: 6px;
         }
         canvas {
             flex: 1;
@@ -48,8 +48,8 @@
         .footer-info {
             display: flex;
             justify-content: space-between;
-            margin-top: 8px;
-            font-size: 9px;
+            padding: 6px 4px;
+            font-size: 10px;
             color: #8fa0b5;
         }
     </style>
@@ -79,7 +79,7 @@
         window.addEventListener('resize', resize);
         resize();
 
-        let player = { x: 50, y: 150, r: 12, vy: 0, gravity: 0.5, jump: -8, grounded: false };
+        let player = { x: 50, y: 150, r: 14, vy: 0, gravity: 0.5, jump: -9, grounded: false };
         let obstacles = [];
         let score = 0;
         let tokens = 0;
@@ -105,16 +105,15 @@
 
         window.addEventListener('keydown', e => { if (e.code === 'Space') triggerJump(); });
         canvas.addEventListener('click', triggerJump);
-        canvas.addEventListener('touchstart', e => { e.preventDefault(); triggerJump(); });
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); triggerJump(); }, { passive: false });
 
         let frame = 0;
         function loop() {
             frame++;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            let groundY = canvas.height - 30;
+            let groundY = canvas.height - 40;
 
-            // Physics
             if (!isOver) {
                 player.vy += player.gravity;
                 player.y += player.vy;
@@ -125,24 +124,23 @@
                     player.grounded = true;
                 }
 
-                if (frame % 90 === 0) {
-                    obstacles.push({ x: canvas.width, w: 15, h: 25, type: Math.random() > 0.5 ? 'obs' : 'coin' });
+                if (frame % 85 === 0) {
+                    obstacles.push({ x: canvas.width, w: 18, h: 30, type: Math.random() > 0.4 ? 'obs' : 'coin' });
                 }
 
                 obstacles.forEach(o => {
-                    o.x -= 3;
-                    // Collision
-                    if (Math.abs(o.x - player.x) < 20) {
+                    o.x -= 3.5;
+                    if (Math.abs(o.x - player.x) < 22) {
                         if (o.type === 'obs' && player.y + player.r >= groundY - o.h) {
                             isOver = true;
-                        } else if (o.type === 'coin' && Math.abs((groundY - o.h/2) - player.y) < 25) {
+                        } else if (o.type === 'coin' && Math.abs((groundY - o.h/2) - player.y) < 30) {
                             tokens += 5;
-                            o.x = -100; // remove
+                            o.x = -100;
                         }
                     }
                 });
 
-                obstacles = obstacles.filter(o => o.x > -30);
+                obstacles = obstacles.filter(o => o.x > -40);
                 score++;
             }
 
@@ -164,12 +162,11 @@
                 } else {
                     ctx.fillStyle = "#ffd700";
                     ctx.beginPath();
-                    ctx.arc(o.x, groundY - 15, 7, 0, Math.PI * 2);
+                    ctx.arc(o.x, groundY - 18, 8, 0, Math.PI * 2);
                     ctx.fill();
                 }
             });
 
-            // UI
             document.getElementById("scoreText").innerText = "SCORE: " + Math.floor(score/10);
             document.getElementById("tokenText").innerText = "SQK: " + tokens;
 
