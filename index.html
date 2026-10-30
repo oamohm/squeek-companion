@@ -9,14 +9,13 @@
 
         :root {
             --bg-base: #03060d;
-            --bg-panel: rgba(13, 22, 38, 0.85);
-            --bg-card: rgba(20, 32, 54, 0.9);
+            --bg-panel: rgba(13, 22, 38, 0.95);
+            --bg-card: rgba(20, 32, 54, 0.95);
             --primary: #00ffcc;
             --primary-glow: rgba(0, 255, 204, 0.4);
             --secondary: #ff007a;
             --secondary-glow: rgba(255, 0, 122, 0.4);
             --accent-gold: #ffd700;
-            --accent-gold-glow: rgba(255, 215, 0, 0.5);
             --text-bright: #ffffff;
             --text-muted: #8fa0b5;
             --text-dark: #4a5c70;
@@ -37,7 +36,7 @@
 
         html, body {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             background-color: var(--bg-base);
             color: var(--primary);
             font-family: var(--font-pixel);
@@ -47,34 +46,20 @@
             align-items: center;
         }
 
-        /* Ambient Cyber Grid Overlay */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: 
-                linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-            pointer-events: none;
-            z-index: 1;
-        }
-
         .app-root {
             position: relative;
             z-index: 2;
-            width: 100vw;
-            height: 100vh;
-            max-width: 520px;
-            max-height: 900px;
+            width: 100%;
+            height: 100%;
+            max-width: 480px;
+            max-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 10px;
+            padding: 6px;
             background: var(--bg-panel);
             border: 2px solid var(--primary);
             box-shadow: var(--border-glow);
-            backdrop-filter: blur(10px);
         }
 
         header.arcade-header {
@@ -82,27 +67,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
+            padding: 6px 10px;
             background: var(--bg-card);
             border: 1px solid var(--primary);
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.15);
+            border-radius: 6px;
             flex-shrink: 0;
         }
 
         .branding-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .branding-avatar {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             background: #ffb703;
             border-radius: 50%;
             border: 2px solid var(--primary);
-            box-shadow: 0 0 8px #ffb703;
         }
 
         .branding-text {
@@ -111,47 +94,39 @@
         }
 
         .branding-text .main-title {
-            font-size: 10px;
+            font-size: 8px;
             color: var(--text-bright);
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 5px var(--primary);
+            text-shadow: 0 0 4px var(--primary);
         }
 
         .branding-text .sub-title {
-            font-size: 6px;
+            font-size: 5px;
             color: var(--text-muted);
             font-family: var(--font-mono);
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .btn-web3 {
             background: linear-gradient(135deg, #ff007a, #990049);
             color: var(--text-bright);
             border: 1px solid #ff55a3;
-            padding: 8px 12px;
+            padding: 6px 10px;
             font-family: var(--font-pixel);
-            font-size: 8px;
+            font-size: 7px;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 4px;
             box-shadow: var(--secondary-glow);
-            transition: all 0.2s ease;
-        }
-
-        .btn-web3:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 0 15px rgba(255, 0, 122, 0.6);
         }
 
         .viewport-wrapper {
             position: relative;
             width: 100%;
-            flex: 1 1 auto;
-            margin: 8px 0;
+            flex: 1;
+            margin: 4px 0;
             background: #000000;
             border: 2px solid var(--primary);
-            border-radius: 8px;
+            border-radius: 6px;
             overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
         }
 
         canvas#viewportCanvas {
@@ -166,15 +141,15 @@
             width: 100%;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
+            gap: 4px;
             flex-shrink: 0;
         }
 
         .stat-card {
             background: var(--bg-card);
             border: 1px solid rgba(0, 255, 204, 0.2);
-            padding: 8px 4px;
-            border-radius: 6px;
+            padding: 5px 2px;
+            border-radius: 4px;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -182,15 +157,15 @@
         }
 
         .stat-card .label {
-            font-size: 6px;
+            font-size: 5px;
             color: var(--text-muted);
             font-family: var(--font-mono);
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .stat-card .val {
-            font-size: 8px;
+            font-size: 7px;
             color: var(--primary);
             font-family: var(--font-pixel);
             word-break: break-all;
@@ -199,18 +174,19 @@
         footer.arcade-footer {
             width: 100%;
             text-align: center;
-            font-size: 6px;
+            font-size: 5px;
             color: var(--text-dark);
             font-family: var(--font-mono);
-            margin-top: 6px;
+            margin-top: 2px;
             flex-shrink: 0;
         }
 
-        @media (max-height: 600px) {
-            .app-root { padding: 4px; }
-            header.arcade-header { padding: 6px; }
-            .dashboard-container { gap: 4px; }
-            .stat-card { padding: 4px 2px; }
+        @media (min-width: 768px) {
+            .app-root {
+                max-width: 460px;
+                height: 92vh;
+                border-radius: 10px;
+            }
         }
     </style>
 </head>
@@ -222,7 +198,7 @@
                 <div class="branding-avatar"></div>
                 <div class="branding-text">
                     <span class="main-title">SQUEEKCHAIN</span>
-                    <span class="sub-title">WHEEL RUNNER PROTOCOL v3.0</span>
+                    <span class="sub-title">WHEEL RUNNER v3.0</span>
                 </div>
             </div>
             <button class="btn-web3" id="walletConnectBtn">CONNECT WALLET</button>
@@ -252,18 +228,11 @@
         </div>
 
         <arcade-footer class="arcade-footer">
-            SQUEEKCHAIN DETERMINISTIC EXECUTION LAYER • PRESS SPACE / TAP TO JUMP
+            DETERMINISTIC EXECUTION • TAP TO JUMP
         </arcade-footer>
     </div>
 
     <script>
-        /**
-         * ====================================================================
-         * SQUEEKCHAIN GENESIS ENGINE CORE - COMPREHENSIVE SYSTEM CODE
-         * ====================================================================
-         */
-
-        // 1. SOUND SYSTEM SYNTHESIZER (Web Audio API)
         class AudioEngine {
             constructor() {
                 this.ctx = null;
@@ -294,9 +263,7 @@
                     gain.connect(this.ctx.destination);
                     osc.start();
                     osc.stop(this.ctx.currentTime + duration);
-                } catch (e) {
-                    console.warn("Audio Context Error:", e);
-                }
+                } catch (e) {}
             }
 
             playJumpSound() {
@@ -320,11 +287,10 @@
             }
         }
 
-        // 2. WEB3 WALLET & STATE CONNECTOR
         class Web3Connector {
             constructor(uiCallback) {
                 this.address = null;
-                this.balance = 1250; // Base Genesis SQK mock balance
+                this.balance = 1250;
                 this.isConnected = false;
                 this.uiCallback = uiCallback;
                 this.initBtn();
@@ -343,11 +309,8 @@
                         this.isConnected = true;
                         this.updateBtn();
                         if (this.uiCallback) this.uiCallback(this);
-                    } catch (e) {
-                        console.error("Wallet Connection Denied:", e);
-                    }
+                    } catch (e) {}
                 } else {
-                    // Web3 Provider Mock fallback for mobile browser previewing
                     this.address = "0x" + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
                     this.isConnected = true;
                     this.updateBtn();
@@ -366,7 +329,6 @@
             }
         }
 
-        // 3. GAME ENGINE STATE & RENDERER
         class SqueekGameEngine {
             constructor() {
                 this.canvas = document.getElementById('viewportCanvas');
@@ -376,7 +338,7 @@
                 this.audio = new AudioEngine();
                 this.web3 = new Web3Connector(() => this.syncHUD());
 
-                this.state = "START"; // START, PLAYING, GAMEOVER
+                this.state = "START";
                 this.distance = 0;
                 this.coinsCollected = 0;
                 this.energy = 100;
@@ -388,7 +350,7 @@
                     x: 0,
                     y: 0,
                     vy: 0,
-                    radius: 12,
+                    radius: 11,
                     grounded: true
                 };
 
@@ -452,7 +414,6 @@
                 const totalSQK = (this.web3.balance + (this.coinsCollected * 10));
                 document.getElementById('hudTokens').innerText = totalSQK;
 
-                // Dynamic Stage Progression
                 if (this.distance < 100) {
                     this.stage = 1;
                     document.getElementById('hudStage').innerText = "1: CYBER";
@@ -469,15 +430,15 @@
             }
 
             spawnParticles(x, y, color) {
-                for (let i = 0; i < 6; i++) {
+                for (let i = 0; i < 5; i++) {
                     this.particles.push({
                         x: x,
                         y: y,
                         vx: (Math.random() - 0.5) * 4,
                         vy: (Math.random() - 0.5) * 4,
-                        radius: Math.random() * 3 + 1,
+                        radius: Math.random() * 2.5 + 1,
                         color: color,
-                        life: 20
+                        life: 18
                     });
                 }
             }
@@ -487,7 +448,7 @@
 
                 this.frame++;
                 this.distance += 0.12;
-                this.energy -= 0.022; // Energy drain rate
+                this.energy -= 0.022;
                 this.wheelAngle += 0.04 + (this.stage * 0.005);
 
                 if (this.energy <= 0) {
@@ -495,15 +456,13 @@
                     this.audio.playGameOverSound();
                 }
 
-                // Wheel & Ground physics calculation
                 const centerX = this.canvas.width / 2;
                 const centerY = this.canvas.height / 2;
                 const wheelRadius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
-                const groundY = centerY + wheelRadius - 16;
+                const groundY = centerY + wheelRadius - 14;
 
                 this.hamster.x = centerX - (wheelRadius * 0.55);
 
-                // Gravity Application
                 this.hamster.vy += this.canvas.height * 0.00095;
                 this.hamster.y += this.hamster.vy;
 
@@ -513,28 +472,26 @@
                     this.hamster.grounded = true;
                 }
 
-                // Obstacle & Coin Spawners
                 const obstacleInterval = Math.max(50, 90 - (this.stage * 10));
                 if (this.frame % obstacleInterval === 0) {
                     this.obstacles.push({
                         x: this.canvas.width + 20,
-                        size: 16 + Math.random() * 6
+                        size: 14 + Math.random() * 6
                     });
                 }
 
                 if (this.frame % 105 === 0) {
                     this.coins.push({
                         x: this.canvas.width + 20,
-                        y: groundY - (Math.random() * 50 + 25)
+                        y: groundY - (Math.random() * 45 + 20)
                     });
                 }
 
                 const moveSpeed = 3.2 + (this.stage * 0.5);
 
-                // Obstacle Collision Logic
                 this.obstacles.forEach((obs, idx) => {
                     obs.x -= moveSpeed;
-                    if (Math.abs(obs.x - this.hamster.x) < 18 && this.hamster.y >= groundY - 10) {
+                    if (Math.abs(obs.x - this.hamster.x) < 16 && this.hamster.y >= groundY - 8) {
                         this.energy -= 18;
                         this.audio.playHitSound();
                         this.spawnParticles(this.hamster.x, this.hamster.y, "#ff007a");
@@ -542,10 +499,9 @@
                     }
                 });
 
-                // Coin Collection Logic
                 this.coins.forEach((coin, idx) => {
                     coin.x -= moveSpeed;
-                    if (Math.abs(coin.x - this.hamster.x) < 20 && Math.abs(coin.y - this.hamster.y) < 20) {
+                    if (Math.abs(coin.x - this.hamster.x) < 18 && Math.abs(coin.y - this.hamster.y) < 18) {
                         this.coinsCollected++;
                         this.energy = Math.min(100, this.energy + 10);
                         this.audio.playCoinSound();
@@ -554,8 +510,7 @@
                     }
                 });
 
-                // Update Particles
-                this.particles.forEach((p, idx) => {
+                this.particles.forEach((p) => {
                     p.x += p.vx;
                     p.y += p.vy;
                     p.life--;
@@ -575,22 +530,16 @@
                 const centerY = this.canvas.height / 2;
                 const wheelRadius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
 
-                // Background Theme Colors per Stage
                 let themeColor = "#00ffcc";
                 if (this.stage === 2) themeColor = "#ffd700";
                 if (this.stage === 3) themeColor = "#ff007a";
 
-                // Outer Spinning Wheel Protocol
                 this.ctx.strokeStyle = themeColor;
                 this.ctx.lineWidth = 3;
-                this.ctx.shadowBlur = 10;
-                this.ctx.shadowColor = themeColor;
                 this.ctx.beginPath();
                 this.ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
                 this.ctx.stroke();
-                this.ctx.shadowBlur = 0; // Reset Glow
 
-                // Internal Wheel Spokes
                 for (let i = 0; i < 8; i++) {
                     let ang = this.wheelAngle + (i * Math.PI / 4);
                     this.ctx.strokeStyle = "rgba(22, 43, 66, 0.6)";
@@ -601,31 +550,27 @@
                     this.ctx.stroke();
                 }
 
-                // Runner Track Segment Arc
                 this.ctx.strokeStyle = "#ff007a";
                 this.ctx.lineWidth = 4;
                 this.ctx.beginPath();
-                this.ctx.arc(centerX, centerY, wheelRadius - 6, 0.22 * Math.PI, 0.78 * Math.PI);
+                this.ctx.arc(centerX, centerY, wheelRadius - 5, 0.22 * Math.PI, 0.78 * Math.PI);
                 this.ctx.stroke();
 
-                const groundY = centerY + wheelRadius - 16;
+                const groundY = centerY + wheelRadius - 14;
 
                 if (this.state === "PLAYING") {
-                    // Draw Obstacles
                     this.ctx.fillStyle = "#ff0055";
                     this.obstacles.forEach(obs => {
                         this.ctx.fillRect(obs.x, groundY - obs.size, obs.size, obs.size);
                     });
 
-                    // Draw SQK Tokens
                     this.ctx.fillStyle = "#ffd700";
                     this.coins.forEach(c => {
                         this.ctx.beginPath();
-                        this.ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
+                        this.ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
                         this.ctx.fill();
                     });
 
-                    // Draw Particles
                     this.particles.forEach(p => {
                         this.ctx.fillStyle = p.color;
                         this.ctx.beginPath();
@@ -633,37 +578,35 @@
                         this.ctx.fill();
                     });
 
-                    // Draw Hamster Avatar
                     this.ctx.fillStyle = "#ffb703";
                     this.ctx.beginPath();
                     this.ctx.arc(this.hamster.x, this.hamster.y, this.hamster.radius, 0, Math.PI * 2);
                     this.ctx.fill();
 
-                    // Avatar Ears
                     this.ctx.fillStyle = "#fb8500";
                     this.ctx.beginPath();
-                    this.ctx.arc(this.hamster.x - 4, this.hamster.y - 10, 3, 0, Math.PI * 2);
-                    this.ctx.arc(this.hamster.x + 4, this.hamster.y - 10, 3, 0, Math.PI * 2);
+                    this.ctx.arc(this.hamster.x - 3, this.hamster.y - 8, 2.5, 0, Math.PI * 2);
+                    this.ctx.arc(this.hamster.x + 3, this.hamster.y - 8, 2.5, 0, Math.PI * 2);
                     this.ctx.fill();
                 } else if (this.state === "START") {
                     this.ctx.fillStyle = "#ffffff";
-                    this.ctx.font = "10px 'Press Start 2P'";
+                    this.ctx.font = "9px 'Press Start 2P'";
                     this.ctx.textAlign = "center";
                     this.ctx.fillText("TAP TO START", centerX, centerY - 10);
 
                     this.ctx.fillStyle = themeColor;
-                    this.ctx.font = "7px 'Press Start 2P'";
-                    this.ctx.fillText("RUN & MINT $SQK TOKENS", centerX, centerY + 15);
+                    this.ctx.font = "6px 'Press Start 2P'";
+                    this.ctx.fillText("RUN & MINT $SQK TOKENS", centerX, centerY + 14);
                 } else if (this.state === "GAMEOVER") {
                     this.ctx.fillStyle = "#ff007a";
-                    this.ctx.font = "12px 'Press Start 2P'";
+                    this.ctx.font = "11px 'Press Start 2P'";
                     this.ctx.textAlign = "center";
-                    this.ctx.fillText("RUN OVER!", centerX, centerY - 20);
+                    this.ctx.fillText("RUN OVER!", centerX, centerY - 18);
 
                     this.ctx.fillStyle = "#ffffff";
-                    this.ctx.font = "7px 'Press Start 2P'";
-                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coinsCollected * 10} SQK`, centerX, centerY + 5);
-                    this.ctx.fillText("TAP TO RESTART", centerX, centerY + 25);
+                    this.ctx.font = "6px 'Press Start 2P'";
+                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coinsCollected * 10} SQK`, centerX, centerY + 4);
+                    this.ctx.fillText("TAP TO RESTART", centerX, centerY + 22);
                 }
             }
 
@@ -674,7 +617,6 @@
             }
         }
 
-        // Initialize Engine on Page Load
         window.addEventListener('DOMContentLoaded', () => {
             window.gameInstance = new SqueekGameEngine();
         });
