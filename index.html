@@ -3,65 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squeekchain AI Wheel Companion</title>
+    <title>Squeekchain Live Hamster Wheel & AI Predictor</title>
     <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --accent-green: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
         body {
-            background-color: #121212;
-            color: #e0e0e0;
-            font-family: monospace, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
         }
-        .container {
-            border: 2px dashed #4caf50;
-            padding: 20px;
-            border-radius: 8px;
+        .header {
             text-align: center;
-            max-width: 400px;
-            background: #1e1e1e;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: var(--accent-green);
+            font-size: 1.8rem;
+            margin: 0 0 5px 0;
+        }
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: rgba(31, 41, 55, 0.5);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-box span {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .stat-box strong {
+            font-size: 1.2rem;
+            color: var(--accent-green);
+        }
+        .wheel-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .wheel {
+            width: 80px;
+            height: 80px;
+            border: 4px dashed var(--accent-green);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 3s linear infinite;
+            animation-play-state: paused;
+        }
+        .wheel.active {
+            animation-play-state: running;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         button {
-            background-color: #4caf50;
-            color: white;
+            background-color: var(--accent-green);
+            color: #000;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 20px;
+            font-weight: bold;
             cursor: pointer;
-            font-size: 16px;
-            border-radius: 4px;
-            margin-top: 15px;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: background 0.2s;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #059669;
+            color: #fff;
         }
-        #output {
+        .log-console {
+            background: #000;
+            color: #34d399;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            height: 80px;
+            overflow-y: auto;
             margin-top: 15px;
-            font-weight: bold;
-            color: #81c784;
+            border: 1px solid var(--border-color);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Squeek AI Wheel Predictor</h2>
-        <p>Live companion tool to simulate and predict hamster economic distance metrics.</p>
-        <button onclick="runPrediction()">Generate AI Prediction</button>
-        <div id="output">Status: Ready for input...</div>
+
+    <div class="header">
+        <h1>Squeekchain Live Companion</h1>
+        <p>Real-time telemetry & AI prediction engine for the hamster economy.</p>
+    </div>
+
+    <div class="dashboard">
+        <div class="card">
+            <div class="wheel-container">
+                <div id="wheel" class="wheel"></div>
+                <p id="wheel-status" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Wheel Status: Idle</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span>Current Distance</span>
+                    <strong id="dist-val">0.00 m</strong>
+                </div>
+                <div class="stat-box">
+                    <span>AI Efficiency</span>
+                    <strong id="eff-val">0.0%</strong>
+                </div>
+                <div class="stat-box">
+                    <span>Block Prediction</span>
+                    <strong id="block-val">#----</strong>
+                </div>
+                <div class="stat-box">
+                    <span>Network Yield</span>
+                    <strong id="yield-val">0.00 SQK</strong>
+                </div>
+            </div>
+
+            <button onclick="triggerAiSimulation()">Run Live AI Simulation</button>
+
+            <div class="log-console" id="console-log">
+                [System] Initialized Squeekchain telemetry link...<br>
+                [System] Ready for live round inputs.
+            </div>
+        </div>
     </div>
 
     <script>
-        function runPrediction() {
-            const outputDiv = document.getElementById("output");
-            outputDiv.innerText = "Analyzing live network metrics...";
-            
-            setTimeout(() => {
-                const randomDistance = (Math.random() * 50 + 10).toFixed(2);
-                const efficiency = (Math.random() * 20 + 80).toFixed(1);
-                outputDiv.innerHTML = `Predicted Distance: ${randomDistance}m<br>Network Efficiency: ${efficiency}%`;
-            }, 1000);
+        let isSimulating = false;
+
+        function logMessage(msg) {
+            const consoleBox = document.getElementById('console-log');
+            consoleBox.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${msg}`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function triggerAiSimulation() {
+            if (isSimulating) return;
+            isSimulating = true;
+
+            const wheel = document.getElementById('wheel');
+            const wheelStatus = document.getElementById('wheel-status');
+            wheel.classList.add('active');
+            wheelStatus.innerText = "Wheel Status: Spinning & Analyzing...";
+            logMessage("Initiating neural network wheel scan...");
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 20;
+                let tempDist = (Math.random() * 15 + progress).toFixed(2);
+                let tempEff = (Math.random() * 5 + 92).toFixed(1);
+                
+                document.getElementById('dist-val').innerText = tempDist + " m";
+                document.getElementById('eff-val').innerText = tempEff + "%";
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    wheel.classList.remove('active');
+                    wheelStatus.innerText = "Wheel Status: Round Completed";
+                    
+                    const finalBlock = Math.floor(Math.random() * 899999 + 100000);
+                    const finalYield = (Math.random() * 3 + 1.2).toFixed(2);
+
+                    document.getElementById('block-val').innerText = "#" + finalBlock;
+                    document.getElementById('yield-val').innerText = finalYield + " SQK";
+
+                    logMessage(`Success! Block #${finalBlock} predicted.`);
+                    logMessage(`Yield calculated: ${finalYield} SQK distributed.`);
+                    isSimulating = false;
+                }
+            }, 300);
         }
     </script>
 </body>
