@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Squeekchain Arcade Genesis</title>
+    <title>Squeekchain Genesis Companion</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -23,17 +23,19 @@
             overflow: hidden;
         }
 
-        .game-container {
+        .app-layout {
             width: 100vw;
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 10px;
+            align-items: center;
+            padding: 8px;
         }
 
         header {
             width: 100%;
+            max-width: 600px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -53,17 +55,18 @@
             background: #ff007a;
             color: #ffffff;
             border: none;
-            padding: 6px 12px;
+            padding: 6px 10px;
             font-family: inherit;
             font-size: 8px;
             cursor: pointer;
             border-radius: 4px;
         }
 
-        .canvas-wrapper {
+        .game-viewport {
             width: 100%;
-            flex-grow: 1;
-            margin: 8px 0;
+            max-width: 600px;
+            flex: 1 1 auto;
+            margin: 6px 0;
             background: #000000;
             border: 2px solid #1a2a40;
             border-radius: 6px;
@@ -72,6 +75,9 @@
         }
 
         canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             display: block;
@@ -79,6 +85,7 @@
 
         .dashboard {
             width: 100%;
+            max-width: 600px;
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 6px;
@@ -88,32 +95,32 @@
         .stat-card {
             background: #121b2d;
             border: 1px solid #00ffcc33;
-            padding: 8px 4px;
+            padding: 6px 4px;
             border-radius: 4px;
             text-align: center;
         }
 
         .stat-label {
-            font-size: 7px;
+            font-size: 6px;
             color: #7d93ad;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .stat-value {
-            font-size: 9px;
+            font-size: 8px;
             color: #00ffcc;
         }
     </style>
 </head>
 <body>
 
-    <div class="game-container">
+    <div class="app-layout">
         <header>
             <div class="title">🐹 SQUEEK GENESIS</div>
             <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">CONNECT WALLET</button>
         </header>
 
-        <div class="canvas-wrapper" id="wrapper">
+        <div class="game-viewport" id="viewport">
             <canvas id="gameCanvas"></canvas>
         </div>
 
@@ -136,11 +143,11 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        const wrapper = document.getElementById("wrapper");
+        const viewport = document.getElementById("viewport");
 
-        function resizeCanvas() {
-            canvas.width = wrapper.clientWidth;
-            canvas.height = wrapper.clientHeight;
+        function fitCanvasToViewport() {
+            canvas.width = viewport.clientWidth;
+            canvas.height = viewport.clientHeight;
         }
 
         let gameState = "START";
@@ -183,18 +190,18 @@
             }
         }
 
-        function jump() {
+        function handleJump() {
             if (gameState === "START" || gameState === "GAMEOVER") {
                 resetGame();
                 gameState = "PLAYING";
             } else if (gameState === "PLAYING") {
-                hamster.vy = -5.5;
+                hamster.vy = -5.2;
             }
         }
 
-        window.addEventListener("keydown", (e) => { if (e.code === "Space") jump(); });
-        window.addEventListener("touchstart", (e) => { if (e.target.tagName !== 'BUTTON') { e.preventDefault(); jump(); } }, {passive: false});
-        canvas.addEventListener("click", jump);
+        window.addEventListener("keydown", (e) => { if (e.code === "Space") handleJump(); });
+        viewport.addEventListener("touchstart", (e) => { e.preventDefault(); handleJump(); }, { passive: false });
+        viewport.addEventListener("click", handleJump);
 
         function resetGame() {
             score = 0;
@@ -212,15 +219,16 @@
             if (gameState !== "PLAYING") return;
 
             frame++;
-            hamster.vy += 0.3;
+            hamster.vy += 0.28;
             hamster.y += hamster.vy;
 
-            if (hamster.y + hamster.radius >= canvas.height - 10 || hamster.y - hamster.radius <= 0) {
+            // Screen Top/Bottom Collision
+            if (hamster.y + hamster.radius >= canvas.height - 8 || hamster.y - hamster.radius <= 0) {
                 endGame();
             }
 
-            let speed = stage === 1 ? 2.2 : (stage === 2 ? 2.8 : 3.5);
-            let spawnRate = stage === 1 ? 90 : (stage === 2 ? 75 : 60);
+            let speed = stage === 1 ? 2.2 : (stage === 2 ? 2.8 : 3.4);
+            let spawnRate = stage === 1 ? 95 : (stage === 2 ? 80 : 65);
 
             if (frame % spawnRate === 0) {
                 let gap = stage === 3 ? 100 : 120;
@@ -275,14 +283,15 @@
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Floor Line
             ctx.fillStyle = stage === 3 ? "#ff007a" : "#00ffcc";
-            ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
+            ctx.fillRect(0, canvas.height - 8, canvas.width, 8);
 
             if (gameState === "PLAYING" || gameState === "GAMEOVER") {
                 pipes.forEach(p => {
                     ctx.fillStyle = stage === 3 ? "#00ffcc" : "#ff007a";
                     ctx.fillRect(p.x, 0, 35, p.top);
-                    ctx.fillRect(p.x, p.bottom, 35, canvas.height - p.bottom - 10);
+                    ctx.fillRect(p.x, p.bottom, 35, canvas.height - p.bottom - 8);
                 });
 
                 coins.forEach(c => {
@@ -300,24 +309,24 @@
                 ctx.fill();
 
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "14px 'Press Start 2P'";
+                ctx.font = "12px 'Press Start 2P'";
                 ctx.textAlign = "center";
-                ctx.fillText(score, canvas.width / 2, 35);
+                ctx.fillText(score, canvas.width / 2, 30);
             }
 
             if (gameState === "START") {
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "12px 'Press Start 2P'";
+                ctx.font = "10px 'Press Start 2P'";
                 ctx.textAlign = "center";
                 ctx.fillText("TAP TO START", canvas.width / 2, canvas.height / 2 - 10);
                 ctx.fillStyle = "#00ffcc";
-                ctx.font = "8px 'Press Start 2P'";
+                ctx.font = "7px 'Press Start 2P'";
                 ctx.fillText("COLLECT $SQK TOKENS", canvas.width / 2, canvas.height / 2 + 15);
             } else if (gameState === "GAMEOVER") {
                 ctx.fillStyle = "#ff007a";
                 ctx.font = "12px 'Press Start 2P'";
                 ctx.textAlign = "center";
-                ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+                ctx.fillText("RUN OVER", canvas.width / 2, canvas.height / 2 - 20);
                 ctx.fillStyle = "#ffffff";
                 ctx.font = "8px 'Press Start 2P'";
                 ctx.fillText("SCORE: " + score, canvas.width / 2, canvas.height / 2 + 5);
@@ -333,10 +342,10 @@
         }
 
         window.addEventListener('resize', () => {
-            resizeCanvas();
+            fitCanvasToViewport();
         });
 
-        resizeCanvas();
+        fitCanvasToViewport();
         updateUI();
         loop();
     </script>
