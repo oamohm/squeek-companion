@@ -2,382 +2,682 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Squeekchain Genesis Runner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Squeekchain Genesis Companion - Wheel Protocol Runner</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-base: #03060d;
+            --bg-panel: rgba(13, 22, 38, 0.85);
+            --bg-card: rgba(20, 32, 54, 0.9);
+            --primary: #00ffcc;
+            --primary-glow: rgba(0, 255, 204, 0.4);
+            --secondary: #ff007a;
+            --secondary-glow: rgba(255, 0, 122, 0.4);
+            --accent-gold: #ffd700;
+            --accent-gold-glow: rgba(255, 215, 0, 0.5);
+            --text-bright: #ffffff;
+            --text-muted: #8fa0b5;
+            --text-dark: #4a5c70;
+            --border-glow: 0 0 15px rgba(0, 255, 204, 0.25);
+            --font-pixel: 'Press Start 2P', monospace;
+            --font-mono: 'Share Tech Mono', monospace;
+        }
 
         * {
             box-sizing: border-box;
             user-select: none;
+            -webkit-user-select: none;
             margin: 0;
             padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            background-color: #050811;
-            color: #00ffcc;
-            font-family: 'Press Start 2P', monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
+        html, body {
+            width: 100%;
             height: 100vh;
-            width: 100vw;
-            padding: 8px;
-            overflow: hidden;
-        }
-
-        header {
-            width: 100%;
-            max-width: 480px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            background: #0e1726;
-            border: 2px solid #00ffcc;
-            border-radius: 6px;
-            flex-shrink: 0;
-        }
-
-        .title {
-            font-size: 9px;
-            color: #fff;
-        }
-
-        .btn-wallet {
-            background: #ff007a;
-            color: #fff;
-            border: none;
-            padding: 6px 8px;
-            font-family: inherit;
-            font-size: 8px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .game-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 480px;
-            flex: 1 1 auto;
-            margin: 6px 0;
-            background: #02040a;
-            border: 2px solid #00ffcc;
-            border-radius: 8px;
+            background-color: var(--bg-base);
+            color: var(--primary);
+            font-family: var(--font-pixel);
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        canvas {
+        /* Ambient Cyber Grid Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-root {
+            position: relative;
+            z-index: 2;
+            width: 100vw;
+            height: 100vh;
+            max-width: 520px;
+            max-height: 900px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--bg-panel);
+            border: 2px solid var(--primary);
+            box-shadow: var(--border-glow);
+            backdrop-filter: blur(10px);
+        }
+
+        header.arcade-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.15);
+            flex-shrink: 0;
+        }
+
+        .branding-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .branding-avatar {
+            width: 24px;
+            height: 24px;
+            background: #ffb703;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 8px #ffb703;
+        }
+
+        .branding-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .branding-text .main-title {
+            font-size: 10px;
+            color: var(--text-bright);
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 5px var(--primary);
+        }
+
+        .branding-text .sub-title {
+            font-size: 6px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-top: 2px;
+        }
+
+        .btn-web3 {
+            background: linear-gradient(135deg, #ff007a, #990049);
+            color: var(--text-bright);
+            border: 1px solid #ff55a3;
+            padding: 8px 12px;
+            font-family: var(--font-pixel);
+            font-size: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            box-shadow: var(--secondary-glow);
+            transition: all 0.2s ease;
+        }
+
+        .btn-web3:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 15px rgba(255, 0, 122, 0.6);
+        }
+
+        .viewport-wrapper {
+            position: relative;
+            width: 100%;
+            flex: 1 1 auto;
+            margin: 8px 0;
+            background: #000000;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        canvas#viewportCanvas {
+            position: absolute;
+            top: 0; left: 0;
             width: 100%;
             height: 100%;
             display: block;
         }
 
-        .dashboard-grid {
+        .dashboard-container {
             width: 100%;
-            max-width: 480px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(4, 1fr);
             gap: 6px;
             flex-shrink: 0;
         }
 
         .stat-card {
-            background: #0e1726;
-            border: 1px solid #1f3552;
-            padding: 6px;
-            border-radius: 4px;
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            padding: 8px 4px;
+            border-radius: 6px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .stat-card .label {
             font-size: 6px;
-            color: #8fa0b5;
-            margin-bottom: 2px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
-        .stat-card .value {
-            font-size: 9px;
-            color: #00ffcc;
+        .stat-card .val {
+            font-size: 8px;
+            color: var(--primary);
+            font-family: var(--font-pixel);
+            word-break: break-all;
         }
 
-        footer {
-            font-size: 6px;
-            color: #5d738e;
+        footer.arcade-footer {
+            width: 100%;
             text-align: center;
-            margin-top: 4px;
+            font-size: 6px;
+            color: var(--text-dark);
+            font-family: var(--font-mono);
+            margin-top: 6px;
             flex-shrink: 0;
+        }
+
+        @media (max-height: 600px) {
+            .app-root { padding: 4px; }
+            header.arcade-header { padding: 6px; }
+            .dashboard-container { gap: 4px; }
+            .stat-card { padding: 4px 2px; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="title">🐹 SQUEEK Genesis</div>
-        <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">CONNECT WALLET</button>
-    </header>
+    <div class="app-root">
+        <header class="arcade-header">
+            <div class="branding-group">
+                <div class="branding-avatar"></div>
+                <div class="branding-text">
+                    <span class="main-title">SQUEEKCHAIN</span>
+                    <span class="sub-title">WHEEL RUNNER PROTOCOL v3.0</span>
+                </div>
+            </div>
+            <button class="btn-web3" id="walletConnectBtn">CONNECT WALLET</button>
+        </header>
 
-    <div class="game-wrapper" id="gameBox">
-        <canvas id="gameCanvas"></canvas>
+        <div class="viewport-wrapper" id="viewportWrapper">
+            <canvas id="viewportCanvas"></canvas>
+        </div>
+
+        <div class="dashboard-container">
+            <div class="stat-card">
+                <div class="label">STAGE</div>
+                <div class="val" id="hudStage">1: CYBER</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">DISTANCE</div>
+                <div class="val" id="hudDist">0m</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">ENERGY</div>
+                <div class="val" id="hudEnergy">100%</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">$SQK TOKEN</div>
+                <div class="val" id="hudTokens" style="color: var(--accent-gold);">0</div>
+            </div>
+        </div>
+
+        <arcade-footer class="arcade-footer">
+            SQUEEKCHAIN DETERMINISTIC EXECUTION LAYER • PRESS SPACE / TAP TO JUMP
+        </arcade-footer>
     </div>
-
-    <div class="dashboard-grid">
-        <div class="stat-card">
-            <div class="label">DISTANCE</div>
-            <div class="value" id="uiDist">0 m</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">$SQK COINS</div>
-            <div class="value" id="uiCoins">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">ENERGY</div>
-            <div class="value" id="uiEnergy">100%</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">CHAIN STATUS</div>
-            <div class="value" style="color: #ff007a;" id="uiChain">OFFLINE</div>
-        </div>
-    </div>
-
-    <footer>TAP SCREEN TO JUMP • KEEP HAMSTER ALIVE</footer>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const gameBox = document.getElementById("gameBox");
+        /**
+         * ====================================================================
+         * SQUEEKCHAIN GENESIS ENGINE CORE - COMPREHENSIVE SYSTEM CODE
+         * ====================================================================
+         */
 
-        let audioCtx = null;
-
-        function playSound(freq, type, duration) {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
-        }
-
-        function resizeCanvas() {
-            canvas.width = gameBox.clientWidth;
-            canvas.height = gameBox.clientHeight;
-        }
-
-        let gameState = "START";
-        let score = 0;
-        let coins = 0;
-        let energy = 100;
-
-        let hamster = { x: 0, y: 0, vy: 0, grounded: true, radius: 12 };
-        let obstacles = [];
-        let coinItems = [];
-        let wheelAngle = 0;
-        let frame = 0;
-
-        function connectWallet() {
-            if (window.ethereum) {
-                window.ethereum.request({ method: 'eth_requestAccounts' }).then(accs => {
-                    let addr = accs[0];
-                    document.getElementById("walletBtn").innerText = addr.substring(0, 4) + "..." + addr.substring(38);
-                    document.getElementById("uiChain").innerText = "ONLINE";
-                    document.getElementById("uiChain").style.color = "#00ffcc";
-                    playSound(600, 'sine', 0.2);
-                }).catch(() => {});
-            } else {
-                alert("Web3 Wallet required.");
-            }
-        }
-
-        function jump() {
-            if (gameState === "START" || gameState === "GAMEOVER") {
-                resetGame();
-                gameState = "PLAYING";
-                playSound(440, 'square', 0.1);
-            } else if (hamster.grounded) {
-                hamster.vy = - canvas.height * 0.022;
-                hamster.grounded = false;
-                playSound(350, 'sine', 0.15);
-            }
-        }
-
-        window.addEventListener("keydown", (e) => { if (e.code === "Space") jump(); });
-        gameBox.addEventListener("touchstart", (e) => { e.preventDefault(); jump(); }, { passive: false });
-        gameBox.addEventListener("click", jump);
-
-        function resetGame() {
-            score = 0;
-            coins = 0;
-            energy = 100;
-            hamster.vy = 0;
-            obstacles = [];
-            coinItems = [];
-            frame = 0;
-        }
-
-        function update() {
-            if (gameState !== "PLAYING") return;
-
-            frame++;
-            score += 0.1;
-            energy -= 0.025;
-            wheelAngle += 0.04;
-
-            if (energy <= 0) {
-                gameState = "GAMEOVER";
-                playSound(150, 'sawtooth', 0.3);
+        // 1. SOUND SYSTEM SYNTHESIZER (Web Audio API)
+        class AudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
             }
 
-            let groundY = canvas.height * 0.72;
-            hamster.x = canvas.width * 0.22;
-
-            hamster.vy += canvas.height * 0.001;
-            hamster.y += hamster.vy;
-
-            if (hamster.y >= groundY) {
-                hamster.y = groundY;
-                hamster.vy = 0;
-                hamster.grounded = true;
-            }
-
-            if (frame % 90 === 0) {
-                obstacles.push({ x: canvas.width, size: canvas.width * 0.05 });
-            }
-            if (frame % 110 === 0) {
-                coinItems.push({ x: canvas.width, y: groundY - (Math.random() * canvas.height * 0.15 + 20) });
-            }
-
-            let moveSpeed = canvas.width * 0.009;
-
-            obstacles.forEach((obs, idx) => {
-                obs.x -= moveSpeed;
-                if (Math.abs(obs.x - hamster.x) < 20 && hamster.y > groundY - 10) {
-                    energy -= 20;
-                    playSound(100, 'square', 0.2);
-                    obstacles.splice(idx, 1);
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
                 }
-            });
-
-            coinItems.forEach((c, idx) => {
-                c.x -= moveSpeed;
-                if (Math.abs(c.x - hamster.x) < 20 && Math.abs(c.y - hamster.y) < 20) {
-                    coins += 1;
-                    energy = Math.min(100, energy + 12);
-                    playSound(800, 'sine', 0.1);
-                    coinItems.splice(idx, 1);
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
                 }
-            });
-
-            obstacles = obstacles.filter(o => o.x > -20);
-            coinItems = coinItems.filter(c => c.x > -20);
-
-            document.getElementById("uiDist").innerText = Math.floor(score) + " m";
-            document.getElementById("uiCoins").innerText = coins;
-            document.getElementById("uiEnergy").innerText = Math.max(0, Math.floor(energy)) + "%";
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            let centerX = canvas.width / 2;
-            let centerY = canvas.height / 2;
-            let wheelRadius = Math.min(canvas.width, canvas.height) * 0.42;
-
-            // Outer Wheel Ring
-            ctx.strokeStyle = "#00ffcc";
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
-            ctx.stroke();
-
-            // Wheel Spokes
-            for (let i = 0; i < 8; i++) {
-                let ang = wheelAngle + (i * Math.PI / 4);
-                ctx.strokeStyle = "#162b42";
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.lineTo(centerX + Math.cos(ang) * wheelRadius, centerY + Math.sin(ang) * wheelRadius);
-                ctx.stroke();
             }
 
-            // Track Arc
-            ctx.strokeStyle = "#ff007a";
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, wheelRadius - 10, 0.2 * Math.PI, 0.8 * Math.PI);
-            ctx.stroke();
+            playTone(freq, type = 'sine', duration = 0.1, volume = 0.1) {
+                if (this.muted) return;
+                try {
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {
+                    console.warn("Audio Context Error:", e);
+                }
+            }
 
-            let groundY = canvas.height * 0.72;
+            playJumpSound() {
+                this.playTone(350, 'sine', 0.12, 0.08);
+                setTimeout(() => this.playTone(520, 'sine', 0.15, 0.06), 40);
+            }
 
-            if (gameState === "PLAYING") {
-                // Hamster Body
-                ctx.fillStyle = "#ffb703";
-                ctx.beginPath();
-                ctx.arc(hamster.x, hamster.y, hamster.radius, 0, Math.PI * 2);
-                ctx.fill();
+            playCoinSound() {
+                this.playTone(880, 'square', 0.08, 0.05);
+                setTimeout(() => this.playTone(1320, 'square', 0.12, 0.05), 60);
+            }
 
-                // Ears
-                ctx.fillStyle = "#fb8500";
-                ctx.beginPath();
-                ctx.arc(hamster.x - 4, hamster.y - 10, 3, 0, Math.PI * 2);
-                ctx.arc(hamster.x + 4, hamster.y - 10, 3, 0, Math.PI * 2);
-                ctx.fill();
+            playHitSound() {
+                this.playTone(120, 'sawtooth', 0.25, 0.15);
+            }
 
-                // Obstacles
-                ctx.fillStyle = "#ff0055";
-                obstacles.forEach(obs => {
-                    ctx.fillRect(obs.x, groundY - obs.size / 2, obs.size, obs.size);
+            playGameOverSound() {
+                this.playTone(300, 'sawtooth', 0.2, 0.1);
+                setTimeout(() => this.playTone(200, 'sawtooth', 0.2, 0.1), 150);
+                setTimeout(() => this.playTone(100, 'sawtooth', 0.4, 0.1), 300);
+            }
+        }
+
+        // 2. WEB3 WALLET & STATE CONNECTOR
+        class Web3Connector {
+            constructor(uiCallback) {
+                this.address = null;
+                this.balance = 1250; // Base Genesis SQK mock balance
+                this.isConnected = false;
+                this.uiCallback = uiCallback;
+                this.initBtn();
+            }
+
+            initBtn() {
+                const btn = document.getElementById('walletConnectBtn');
+                btn.addEventListener('click', () => this.connect());
+            }
+
+            async connect() {
+                if (window.ethereum) {
+                    try {
+                        const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        this.address = accs[0];
+                        this.isConnected = true;
+                        this.updateBtn();
+                        if (this.uiCallback) this.uiCallback(this);
+                    } catch (e) {
+                        console.error("Wallet Connection Denied:", e);
+                    }
+                } else {
+                    // Web3 Provider Mock fallback for mobile browser previewing
+                    this.address = "0x" + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
+                    this.isConnected = true;
+                    this.updateBtn();
+                    if (this.uiCallback) this.uiCallback(this);
+                }
+            }
+
+            updateBtn() {
+                const btn = document.getElementById('walletConnectBtn');
+                if (this.isConnected && this.address) {
+                    btn.innerText = `${this.address.substring(0, 4)}...${this.address.substring(38)}`;
+                    btn.style.background = "linear-gradient(135deg, #00ffcc, #008866)";
+                    btn.style.color = "#000";
+                    btn.style.border = "1px solid #00ffcc";
+                }
+            }
+        }
+
+        // 3. GAME ENGINE STATE & RENDERER
+        class SqueekGameEngine {
+            constructor() {
+                this.canvas = document.getElementById('viewportCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.wrapper = document.getElementById('viewportWrapper');
+
+                this.audio = new AudioEngine();
+                this.web3 = new Web3Connector(() => this.syncHUD());
+
+                this.state = "START"; // START, PLAYING, GAMEOVER
+                this.distance = 0;
+                this.coinsCollected = 0;
+                this.energy = 100;
+                this.stage = 1;
+                this.frame = 0;
+                this.wheelAngle = 0;
+
+                this.hamster = {
+                    x: 0,
+                    y: 0,
+                    vy: 0,
+                    radius: 12,
+                    grounded: true
+                };
+
+                this.obstacles = [];
+                this.coins = [];
+                this.particles = [];
+
+                this.initEventListeners();
+                this.resizeCanvas();
+                this.loop = this.loop.bind(this);
+                requestAnimationFrame(loop => this.loop(loop));
+            }
+
+            initEventListeners() {
+                window.addEventListener('resize', () => this.resizeCanvas());
+
+                const triggerJump = (e) => {
+                    if (e.target.tagName === 'BUTTON') return;
+                    if (e.type === 'touchstart') e.preventDefault();
+                    
+                    this.audio.init();
+
+                    if (this.state === "START" || this.state === "GAMEOVER") {
+                        this.resetGame();
+                        this.state = "PLAYING";
+                    } else if (this.state === "PLAYING" && this.hamster.grounded) {
+                        this.hamster.vy = -this.canvas.height * 0.021;
+                        this.hamster.grounded = false;
+                        this.audio.playJumpSound();
+                    }
+                };
+
+                window.addEventListener('keydown', (e) => { if (e.code === 'Space') triggerJump(e); });
+                this.wrapper.addEventListener('touchstart', triggerJump, { passive: false });
+                this.wrapper.addEventListener('click', triggerJump);
+            }
+
+            resizeCanvas() {
+                this.canvas.width = this.wrapper.clientWidth;
+                this.canvas.height = this.wrapper.clientHeight;
+            }
+
+            resetGame() {
+                this.distance = 0;
+                this.coinsCollected = 0;
+                this.energy = 100;
+                this.stage = 1;
+                this.frame = 0;
+                this.wheelAngle = 0;
+                this.hamster.vy = 0;
+                this.obstacles = [];
+                this.coins = [];
+                this.particles = [];
+                this.syncHUD();
+            }
+
+            syncHUD() {
+                document.getElementById('hudDist').innerText = `${Math.floor(this.distance)}m`;
+                document.getElementById('hudEnergy').innerText = `${Math.max(0, Math.floor(this.energy))}%`;
+                
+                const totalSQK = (this.web3.balance + (this.coinsCollected * 10));
+                document.getElementById('hudTokens').innerText = totalSQK;
+
+                // Dynamic Stage Progression
+                if (this.distance < 100) {
+                    this.stage = 1;
+                    document.getElementById('hudStage').innerText = "1: CYBER";
+                    document.getElementById('hudStage').style.color = "#00ffcc";
+                } else if (this.distance < 250) {
+                    this.stage = 2;
+                    document.getElementById('hudStage').innerText = "2: WHEEL";
+                    document.getElementById('hudStage').style.color = "#ffd700";
+                } else {
+                    this.stage = 3;
+                    document.getElementById('hudStage').innerText = "3: CORE";
+                    document.getElementById('hudStage').style.color = "#ff007a";
+                }
+            }
+
+            spawnParticles(x, y, color) {
+                for (let i = 0; i < 6; i++) {
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
+                        radius: Math.random() * 3 + 1,
+                        color: color,
+                        life: 20
+                    });
+                }
+            }
+
+            update() {
+                if (this.state !== "PLAYING") return;
+
+                this.frame++;
+                this.distance += 0.12;
+                this.energy -= 0.022; // Energy drain rate
+                this.wheelAngle += 0.04 + (this.stage * 0.005);
+
+                if (this.energy <= 0) {
+                    this.state = "GAMEOVER";
+                    this.audio.playGameOverSound();
+                }
+
+                // Wheel & Ground physics calculation
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const wheelRadius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
+                const groundY = centerY + wheelRadius - 16;
+
+                this.hamster.x = centerX - (wheelRadius * 0.55);
+
+                // Gravity Application
+                this.hamster.vy += this.canvas.height * 0.00095;
+                this.hamster.y += this.hamster.vy;
+
+                if (this.hamster.y >= groundY) {
+                    this.hamster.y = groundY;
+                    this.hamster.vy = 0;
+                    this.hamster.grounded = true;
+                }
+
+                // Obstacle & Coin Spawners
+                const obstacleInterval = Math.max(50, 90 - (this.stage * 10));
+                if (this.frame % obstacleInterval === 0) {
+                    this.obstacles.push({
+                        x: this.canvas.width + 20,
+                        size: 16 + Math.random() * 6
+                    });
+                }
+
+                if (this.frame % 105 === 0) {
+                    this.coins.push({
+                        x: this.canvas.width + 20,
+                        y: groundY - (Math.random() * 50 + 25)
+                    });
+                }
+
+                const moveSpeed = 3.2 + (this.stage * 0.5);
+
+                // Obstacle Collision Logic
+                this.obstacles.forEach((obs, idx) => {
+                    obs.x -= moveSpeed;
+                    if (Math.abs(obs.x - this.hamster.x) < 18 && this.hamster.y >= groundY - 10) {
+                        this.energy -= 18;
+                        this.audio.playHitSound();
+                        this.spawnParticles(this.hamster.x, this.hamster.y, "#ff007a");
+                        this.obstacles.splice(idx, 1);
+                    }
                 });
 
-                // Coins
-                ctx.fillStyle = "#ffd700";
-                coinItems.forEach(c => {
-                    ctx.beginPath();
-                    ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
-                    ctx.fill();
+                // Coin Collection Logic
+                this.coins.forEach((coin, idx) => {
+                    coin.x -= moveSpeed;
+                    if (Math.abs(coin.x - this.hamster.x) < 20 && Math.abs(coin.y - this.hamster.y) < 20) {
+                        this.coinsCollected++;
+                        this.energy = Math.min(100, this.energy + 10);
+                        this.audio.playCoinSound();
+                        this.spawnParticles(coin.x, coin.y, "#ffd700");
+                        this.coins.splice(idx, 1);
+                    }
                 });
-            } else if (gameState === "START") {
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "10px 'Press Start 2P'";
-                ctx.textAlign = "center";
-                ctx.fillText("TAP TO RUN", centerX, centerY - 10);
-                ctx.fillStyle = "#00ffcc";
-                ctx.font = "7px 'Press Start 2P'";
-                ctx.fillText("KEEP WHEEL SPINNING!", centerX, centerY + 15);
-            } else if (gameState === "GAMEOVER") {
-                ctx.fillStyle = "#ff007a";
-                ctx.font = "12px 'Press Start 2P'";
-                ctx.textAlign = "center";
-                ctx.fillText("EXHAUSTED!", centerX, centerY - 20);
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "7px 'Press Start 2P'";
-                ctx.fillText("DISTANCE: " + Math.floor(score) + "m", centerX, centerY + 5);
-                ctx.fillText("TAP TO RESTART", centerX, centerY + 25);
+
+                // Update Particles
+                this.particles.forEach((p, idx) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                });
+
+                this.obstacles = this.obstacles.filter(o => o.x > -30);
+                this.coins = this.coins.filter(c => c.x > -30);
+                this.particles = this.particles.filter(p => p.life > 0);
+
+                this.syncHUD();
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const wheelRadius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
+
+                // Background Theme Colors per Stage
+                let themeColor = "#00ffcc";
+                if (this.stage === 2) themeColor = "#ffd700";
+                if (this.stage === 3) themeColor = "#ff007a";
+
+                // Outer Spinning Wheel Protocol
+                this.ctx.strokeStyle = themeColor;
+                this.ctx.lineWidth = 3;
+                this.ctx.shadowBlur = 10;
+                this.ctx.shadowColor = themeColor;
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
+                this.ctx.stroke();
+                this.ctx.shadowBlur = 0; // Reset Glow
+
+                // Internal Wheel Spokes
+                for (let i = 0; i < 8; i++) {
+                    let ang = this.wheelAngle + (i * Math.PI / 4);
+                    this.ctx.strokeStyle = "rgba(22, 43, 66, 0.6)";
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(centerX, centerY);
+                    this.ctx.lineTo(centerX + Math.cos(ang) * wheelRadius, centerY + Math.sin(ang) * wheelRadius);
+                    this.ctx.stroke();
+                }
+
+                // Runner Track Segment Arc
+                this.ctx.strokeStyle = "#ff007a";
+                this.ctx.lineWidth = 4;
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, wheelRadius - 6, 0.22 * Math.PI, 0.78 * Math.PI);
+                this.ctx.stroke();
+
+                const groundY = centerY + wheelRadius - 16;
+
+                if (this.state === "PLAYING") {
+                    // Draw Obstacles
+                    this.ctx.fillStyle = "#ff0055";
+                    this.obstacles.forEach(obs => {
+                        this.ctx.fillRect(obs.x, groundY - obs.size, obs.size, obs.size);
+                    });
+
+                    // Draw SQK Tokens
+                    this.ctx.fillStyle = "#ffd700";
+                    this.coins.forEach(c => {
+                        this.ctx.beginPath();
+                        this.ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    });
+
+                    // Draw Particles
+                    this.particles.forEach(p => {
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    });
+
+                    // Draw Hamster Avatar
+                    this.ctx.fillStyle = "#ffb703";
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.hamster.x, this.hamster.y, this.hamster.radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Avatar Ears
+                    this.ctx.fillStyle = "#fb8500";
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.hamster.x - 4, this.hamster.y - 10, 3, 0, Math.PI * 2);
+                    this.ctx.arc(this.hamster.x + 4, this.hamster.y - 10, 3, 0, Math.PI * 2);
+                    this.ctx.fill();
+                } else if (this.state === "START") {
+                    this.ctx.fillStyle = "#ffffff";
+                    this.ctx.font = "10px 'Press Start 2P'";
+                    this.ctx.textAlign = "center";
+                    this.ctx.fillText("TAP TO START", centerX, centerY - 10);
+
+                    this.ctx.fillStyle = themeColor;
+                    this.ctx.font = "7px 'Press Start 2P'";
+                    this.ctx.fillText("RUN & MINT $SQK TOKENS", centerX, centerY + 15);
+                } else if (this.state === "GAMEOVER") {
+                    this.ctx.fillStyle = "#ff007a";
+                    this.ctx.font = "12px 'Press Start 2P'";
+                    this.ctx.textAlign = "center";
+                    this.ctx.fillText("RUN OVER!", centerX, centerY - 20);
+
+                    this.ctx.fillStyle = "#ffffff";
+                    this.ctx.font = "7px 'Press Start 2P'";
+                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coinsCollected * 10} SQK`, centerX, centerY + 5);
+                    this.ctx.fillText("TAP TO RESTART", centerX, centerY + 25);
+                }
+            }
+
+            loop() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.loop());
             }
         }
 
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        loop();
+        // Initialize Engine on Page Load
+        window.addEventListener('DOMContentLoaded', () => {
+            window.gameInstance = new SqueekGameEngine();
+        });
     </script>
 </body>
 </html>
