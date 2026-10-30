@@ -2,185 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Squeekchain Simple Runner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squeekchain AI Wheel Companion</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body {
-            background: #03060d;
-            color: #00ffcc;
-            font-family: monospace;
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: monospace, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            width: 100vw;
-            overflow: hidden;
+            margin: 0;
         }
-        .game-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background: #0d1626;
-            border: 2px solid #00ffcc;
-            padding: 8px;
+        .container {
+            border: 2px dashed #4caf50;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            background: #1e1e1e;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 10px;
-            font-size: 11px;
-            border-bottom: 1px solid #1f3552;
-            background: #142036;
+        button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
             border-radius: 4px;
-            margin-bottom: 6px;
+            margin-top: 15px;
         }
-        canvas {
-            flex: 1;
-            background: #000;
-            border: 1px solid #00ffcc;
-            display: block;
-            width: 100%;
+        button:hover {
+            background-color: #45a049;
         }
-        .footer-info {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 4px;
-            font-size: 10px;
-            color: #8fa0b5;
+        #output {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #81c784;
         }
     </style>
 </head>
 <body>
-
-    <div class="game-container">
-        <header>
-            <span>SQUEEK RUNNER</span>
-            <span id="scoreText">SCORE: 0</span>
-        </header>
-        <canvas id="cvs"></canvas>
-        <div class="footer-info">
-            <span>TAP TO JUMP</span>
-            <span style="color: #ffd700;" id="tokenText">SQK: 0</span>
-        </div>
+    <div class="container">
+        <h2>Squeek AI Wheel Predictor</h2>
+        <p>Live companion tool to simulate and predict hamster economic distance metrics.</p>
+        <button onclick="runPrediction()">Generate AI Prediction</button>
+        <div id="output">Status: Ready for input...</div>
     </div>
 
     <script>
-        const canvas = document.getElementById("cvs");
-        const ctx = canvas.getContext("2d");
-
-        function resize() {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
+        function runPrediction() {
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerText = "Analyzing live network metrics...";
+            
+            setTimeout(() => {
+                const randomDistance = (Math.random() * 50 + 10).toFixed(2);
+                const efficiency = (Math.random() * 20 + 80).toFixed(1);
+                outputDiv.innerHTML = `Predicted Distance: ${randomDistance}m<br>Network Efficiency: ${efficiency}%`;
+            }, 1000);
         }
-        window.addEventListener('resize', resize);
-        resize();
-
-        let player = { x: 50, y: 150, r: 14, vy: 0, gravity: 0.5, jump: -9, grounded: false };
-        let obstacles = [];
-        let score = 0;
-        let tokens = 0;
-        let isOver = false;
-
-        function reset() {
-            player.y = canvas.height / 2;
-            player.vy = 0;
-            obstacles = [];
-            score = 0;
-            tokens = 0;
-            isOver = false;
-        }
-
-        function triggerJump() {
-            if (isOver) {
-                reset();
-            } else if (player.grounded) {
-                player.vy = player.jump;
-                player.grounded = false;
-            }
-        }
-
-        window.addEventListener('keydown', e => { if (e.code === 'Space') triggerJump(); });
-        canvas.addEventListener('click', triggerJump);
-        canvas.addEventListener('touchstart', e => { e.preventDefault(); triggerJump(); }, { passive: false });
-
-        let frame = 0;
-        function loop() {
-            frame++;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            let groundY = canvas.height - 40;
-
-            if (!isOver) {
-                player.vy += player.gravity;
-                player.y += player.vy;
-
-                if (player.y >= groundY - player.r) {
-                    player.y = groundY - player.r;
-                    player.vy = 0;
-                    player.grounded = true;
-                }
-
-                if (frame % 85 === 0) {
-                    obstacles.push({ x: canvas.width, w: 18, h: 30, type: Math.random() > 0.4 ? 'obs' : 'coin' });
-                }
-
-                obstacles.forEach(o => {
-                    o.x -= 3.5;
-                    if (Math.abs(o.x - player.x) < 22) {
-                        if (o.type === 'obs' && player.y + player.r >= groundY - o.h) {
-                            isOver = true;
-                        } else if (o.type === 'coin' && Math.abs((groundY - o.h/2) - player.y) < 30) {
-                            tokens += 5;
-                            o.x = -100;
-                        }
-                    }
-                });
-
-                obstacles = obstacles.filter(o => o.x > -40);
-                score++;
-            }
-
-            // Draw Ground
-            ctx.fillStyle = "#ff007a";
-            ctx.fillRect(0, groundY, canvas.width, 4);
-
-            // Draw Player
-            ctx.fillStyle = "#ffb703";
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Draw Obstacles & Coins
-            obstacles.forEach(o => {
-                if (o.type === 'obs') {
-                    ctx.fillStyle = "#ff0055";
-                    ctx.fillRect(o.x, groundY - o.h, o.w, o.h);
-                } else {
-                    ctx.fillStyle = "#ffd700";
-                    ctx.beginPath();
-                    ctx.arc(o.x, groundY - 18, 8, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-
-            document.getElementById("scoreText").innerText = "SCORE: " + Math.floor(score/10);
-            document.getElementById("tokenText").innerText = "SQK: " + tokens;
-
-            if (isOver) {
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "12px monospace";
-                ctx.textAlign = "center";
-                ctx.fillText("GAME OVER - TAP TO RESTART", canvas.width / 2, canvas.height / 2);
-            }
-
-            requestAnimationFrame(loop);
-        }
-
-        loop();
     </script>
 </body>
 </html>
