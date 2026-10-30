@@ -1,548 +1,361 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Squeekchain: Hamster Wheel Runner</title>
-    <!-- Tailwind CSS for UI overlay styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squeekchain Genesis Runner</title>
     <style>
-        /* Retro Arcade & Pixel Art Font Styles */
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
 
         body {
-            background-color: #050508;
+            background-color: #050811;
             color: #00ffcc;
-            font-family: 'VT323', monospace;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
+            font-family: 'Press Start 2P', monospace;
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: hidden;
         }
 
-        .arcade-font {
-            font-family: 'Press Start 2P', cursive;
+        /* Background starfield animation */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(1px 1px at 20px 30px, #00ffcc, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 100px 150px, #ff00ff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 200px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 300px 250px, #00ffcc, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 350px 350px;
+            opacity: 0.3;
+            z-index: -1;
         }
 
-        /* Scanline effect over canvas */
-        .scanlines {
-            background: linear-gradient(
-                rgba(18, 16, 16, 0) 50%, 
-                rgba(0, 0, 0, 0.25) 50%
-            ), linear-gradient(
-                90deg,
-                rgba(255, 0, 0, 0.03),
-                rgba(0, 255, 0, 0.01),
-                rgba(0, 0, 255, 0.03)
-            );
-            background-size: 100% 4px, 6px 100%;
-            pointer-events: none;
-        }
-
-        /* CRT Screen Glow border */
-        .crt-container {
-            box-shadow: inset 0 0 100px rgba(0, 255, 204, 0.15), 0 0 30px rgba(0, 255, 204, 0.3);
+        header {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(10, 20, 35, 0.85);
             border: 2px solid #00ffcc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            margin-bottom: 10px;
         }
 
-        /* Pulse Animations */
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 15px rgba(0,255,204,0.4); }
-            50% { box-shadow: 0 0 25px rgba(0,255,204,0.8); }
+        .title {
+            font-size: 10px;
+            color: #ffffff;
+            text-shadow: 0 0 5px #00ffcc;
         }
 
-        .btn-glow {
-            animation: pulse-glow 2s infinite;
+        .btn-wallet {
+            background: #ff007a;
+            color: #fff;
+            border: none;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(255, 0, 122, 0.5);
+            transition: 0.2s;
+        }
+
+        .btn-wallet:hover {
+            transform: scale(1.05);
+            background: #ff2a9d;
+        }
+
+        .game-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            height: 480px;
+            background: #000;
+            border: 3px solid #00ffcc;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .dashboard-grid {
+            width: 100%;
+            max-width: 480px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-card {
+            background: rgba(10, 20, 35, 0.85);
+            border: 1px solid #1f3552;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-card .label {
+            font-size: 7px;
+            color: #8fa0b5;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 12px;
+            color: #00ffcc;
+            text-shadow: 0 0 4px #00ffcc;
+        }
+
+        footer {
+            margin-top: 10px;
+            font-size: 7px;
+            color: #5d738e;
+            text-align: center;
         }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col justify-between items-center p-2 md:p-4 bg-slate-950">
+<body>
 
-    <!-- Top Navigation & Web3 Bar -->
-    <header class="w-full max-w-4xl flex justify-between items-center bg-slate-900/90 border border-emerald-500/30 p-3 rounded-lg z-20 backdrop-blur-md">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-xl">
-                🐹
-            </div>
-            <div>
-                <h1 class="arcade-font text-xs md:text-sm text-emerald-400 tracking-wider">SQUEEKCHAIN</h1>
-                <p class="text-xs text-slate-400">GENESIS RUNNER v1.0</p>
-            </div>
-        </div>
-
-        <!-- Web3 Wallet Connection Button -->
-        <button id="walletBtn" onclick="connectWallet()" class="arcade-font text-xs bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2 px-3 md:px-4 rounded transition-all duration-200 border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1">
-            CONNECT WALLET
-        </button>
+    <header>
+        <div class="title">🐹 SQUEEK Genesis v2.0</div>
+        <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">CONNECT WALLET</button>
     </header>
 
-    <!-- Game Container with CRT & Scanlines -->
-    <div class="relative w-full max-w-4xl flex-1 my-2 rounded-xl overflow-hidden crt-container bg-black flex justify-center items-center">
-        <!-- Scanlines overlay -->
-        <div class="absolute inset-0 scanlines z-10"></div>
+    <div class="game-wrapper">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
 
-        <!-- Main Game Canvas -->
-        <canvas id="gameCanvas" class="w-full h-full block"></canvas>
-
-        <!-- Start / Game Over Overlay -->
-        <div id="uiOverlay" class="absolute inset-0 bg-slate-950/85 z-20 flex flex-col justify-center items-center text-center p-6">
-            <h2 id="overlayTitle" class="arcade-font text-2xl md:text-4xl text-emerald-400 mb-4 animate-bounce">
-                HAMSTER WHEEL RUNNER
-            </h2>
-            <p id="overlayDesc" class="text-lg md:text-xl text-slate-300 max-w-md mb-6">
-                Run inside the wheel, jump over obstacles, and gather $SQK tokens to power the blockchain!
-            </p>
-
-            <!-- Final Score Summary (Hidden by default) -->
-            <div id="scoreSummary" class="hidden mb-6 bg-slate-900 border border-emerald-500/40 p-4 rounded-lg w-64">
-                <p class="text-slate-400 text-sm">DISTANCE: <span id="finalDistance" class="text-emerald-400 font-bold">0m</span></p>
-                <p class="text-slate-400 text-sm">SQK COLLECTED: <span id="finalTokens" class="text-yellow-400 font-bold">0</span></p>
-                <p class="text-slate-400 text-sm">FINAL SCORE: <span id="finalScore" class="text-cyan-400 font-bold">0</span></p>
-            </div>
-
-            <button id="startBtn" onclick="startGame()" class="arcade-font text-sm md:text-base bg-emerald-400 text-slate-950 font-bold py-3 px-8 rounded-lg border-b-4 border-emerald-700 hover:bg-emerald-300 transition-all btn-glow">
-                START RUN
-            </button>
-
-            <p class="text-xs text-slate-500 mt-6 hidden md:block">
-                Press [SPACE / UP ARROW] or [TAP SCREEN] to Jump
-            </p>
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <div class="label">DISTANCE</div>
+            <div class="value" id="uiDist">0 m</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">$SQK COINS</div>
+            <div class="value" id="uiCoins">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">ENERGY</div>
+            <div class="value" id="uiEnergy">100%</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">CHAIN STATUS</div>
+            <div class="value" style="color: #ff007a;" id="uiChain">OFFLINE</div>
         </div>
     </div>
 
-    <!-- On-Screen Touch Controls for Mobile -->
-    <div class="w-full max-w-4xl flex gap-2 md:hidden z-20 pb-1">
-        <button id="mobileJumpBtn" class="w-full bg-slate-800 border-2 border-emerald-500/50 text-emerald-400 font-bold py-3 rounded-lg text-lg active:bg-emerald-900/50">
-            TAP / JUMP 🚀
-        </button>
-    </div>
+    <footer>TAP/SPACE TO JUMP • KEEP HAMSTER ALIVE</footer>
 
-    <!-- Web Audio API Sound Synthesizer & Game Engine Script -->
     <script>
-        // --- WEB AUDIO API (SYNTHESIZER) ---
-        class SoundEffects {
-            constructor() {
-                this.ctx = null;
-            }
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            }
-
-            playJump() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.15);
-                
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
-            }
-
-            playCoin() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-                osc.frequency.setValueAtTime(1200, this.ctx.currentTime + 0.08);
-
-                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.2);
-            }
-
-            playHit() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.3);
-
-                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.3);
-            }
-        }
-
-        const sounds = new SoundEffects();
-
-        // --- WEB3 WALLET INTEGRATION ---
-        let userAddress = null;
-
-        async function connectWallet() {
-            const btn = document.getElementById('walletBtn');
-            if (window.ethereum) {
-                try {
-                    btn.innerText = 'CONNECTING...';
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAddress = accounts[0];
-                    const shortAddr = userAddress.slice(0, 4) + '...' + userAddress.slice(-4);
-                    btn.innerText = shortAddr;
-                    btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
-                    btn.classList.add('bg-slate-800', 'text-emerald-400', 'border-emerald-500');
-                } catch (err) {
-                    console.error("Wallet connection failed", err);
-                    btn.innerText = 'CONNECT WALLET';
-                }
-            } else {
-                alert('MetaMask or Web3 wallet not detected in browser.');
-                btn.innerText = 'NO WALLET';
-            }
-        }
-
-        // --- GAME ENGINE ---
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        let isRunning = false;
-        let animationFrameId = null;
-
-        // Resize Canvas dynamically
-        function resizeCanvas() {
-            const container = canvas.parentElement;
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Game Variables
-        let wheelAngle = 0;
-        let wheelSpeed = 0.02;
-        let distance = 0;
-        let sqkTokens = 0;
+        let gameState = "START"; // START, PLAYING, GAMEOVER
+        let score = 0;
+        let coins = 0;
         let energy = 100;
-        let highScore = localStorage.getItem('sqk_highscore') || 0;
+        let walletAddress = null;
 
-        // Player (Hamster) Object
-        const hamster = {
-            x: 0,
-            y: 0,
-            radius: 18,
-            jumpForce: 12,
-            vy: 0,
-            gravity: 0.6,
-            isGrounded: true,
-            baseY: 0,
-            frame: 0,
-            animTimer: 0
-        };
-
-        // Entities arrays
+        let hamster = { x: 80, y: 280, vy: 0, grounded: true, radius: 14 };
         let obstacles = [];
-        let tokens = [];
+        let coinItems = [];
+        let wheelAngle = 0;
+        let frame = 0;
 
-        function initGame() {
-            wheelSpeed = 0.02;
-            distance = 0;
-            sqkTokens = 0;
+        function connectWallet() {
+            if (window.ethereum) {
+                window.ethereum.request({ method: 'eth_requestAccounts' }).then(accs => {
+                    walletAddress = accs[0];
+                    document.getElementById("walletBtn").innerText = walletAddress.substring(0, 6) + "..." + walletAddress.substring(38);
+                    document.getElementById("uiChain").innerText = "ONLINE";
+                    document.getElementById("uiChain").style.color = "#00ffcc";
+                }).catch(() => {});
+            } else {
+                alert("MetaMask / Web3 Wallet required.");
+            }
+        }
+
+        function jump() {
+            if (gameState === "START" || gameState === "GAMEOVER") {
+                resetGame();
+                gameState = "PLAYING";
+            } else if (hamster.grounded) {
+                hamster.vy = -9;
+                hamster.grounded = false;
+            }
+        }
+
+        window.addEventListener("keydown", (e) => { if (e.code === "Space") jump(); });
+        canvas.addEventListener("touchstart", (e) => { e.preventDefault(); jump(); });
+        canvas.addEventListener("click", jump);
+
+        function resetGame() {
+            score = 0;
+            coins = 0;
             energy = 100;
-            obstacles = [];
-            tokens = [];
-
-            // Position Hamster near bottom of wheel
-            hamster.baseY = canvas.height / 2 + canvas.height * 0.32;
-            hamster.x = canvas.width / 2 - 30;
-            hamster.y = hamster.baseY;
+            hamster.y = 280;
             hamster.vy = 0;
-            hamster.isGrounded = true;
+            obstacles = [];
+            coinItems = [];
+            frame = 0;
         }
 
-        function triggerJump() {
-            sounds.init();
-            if (hamster.isGrounded && isRunning) {
-                hamster.vy = -hamster.jumpForce;
-                hamster.isGrounded = false;
-                sounds.playJump();
-            }
-        }
+        function update() {
+            if (gameState !== "PLAYING") return;
 
-        // Input Listeners
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') {
-                e.preventDefault();
-                triggerJump();
-            }
-        });
+            frame++;
+            score += 0.1;
+            energy -= 0.03;
+            wheelAngle += 0.05;
 
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            triggerJump();
-        });
+            if (energy <= 0) gameState = "GAMEOVER";
 
-        document.getElementById('mobileJumpBtn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            triggerJump();
-        });
-
-        // Spawn Spikes or Blocks
-        function spawnObstacle() {
-            if (Math.random() < 0.025) {
-                obstacles.push({
-                    angle: Math.PI / 2 + 0.8, // Spawn ahead on the wheel
-                    size: 20 + Math.random() * 10
-                });
-            }
-        }
-
-        // Spawn SQK Tokens
-        function spawnToken() {
-            if (Math.random() < 0.035) {
-                tokens.push({
-                    angle: Math.PI / 2 + 1.0,
-                    radiusOffset: 30 + Math.random() * 40
-                });
-            }
-        }
-
-        // Main Game Loop
-        function gameLoop() {
-            if (!isRunning) return;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Wheel Geometry
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const wheelRadius = Math.min(canvas.width, canvas.height) * 0.42;
-
-            // Update Physics & Environment
-            wheelAngle += wheelSpeed;
-            distance += Math.floor(wheelSpeed * 10);
-            energy = Math.max(0, energy - 0.03); // Energy slowly drops
-
-            // Difficulty adjustment over time
-            wheelSpeed += 0.000005;
-
-            // Hamster Gravity & Jumping
-            hamster.vy += hamster.gravity;
+            // Gravity & movement
+            hamster.vy += 0.45;
             hamster.y += hamster.vy;
 
-            const groundLevel = centerY + wheelRadius - 25;
-            if (hamster.y >= groundLevel) {
-                hamster.y = groundLevel;
+            if (hamster.y >= 280) {
+                hamster.y = 280;
                 hamster.vy = 0;
-                hamster.isGrounded = true;
+                hamster.grounded = true;
             }
 
-            // Hamster Animation frame
-            hamster.animTimer++;
-            if (hamster.animTimer % 6 === 0) {
-                hamster.frame = (hamster.frame + 1) % 4;
+            // Obstacles & Coins Spawning
+            if (frame % 90 === 0) {
+                obstacles.push({ x: 420, size: 18 });
+            }
+            if (frame % 120 === 0) {
+                coinItems.push({ x: 420, y: 230 - Math.random() * 50 });
             }
 
-            // --- DRAW ROTATING HAMSTER WHEEL ---
-            ctx.save();
-            ctx.translate(centerX, centerY);
+            // Move Obstacles
+            obstacles.forEach((obs, idx) => {
+                obs.x -= 4;
+                // Collision
+                if (Math.abs(obs.x - hamster.x) < 20 && hamster.y > 260) {
+                    energy -= 20;
+                    obstacles.splice(idx, 1);
+                }
+            });
 
-            // Outer Wheel Rim
-            ctx.beginPath();
-            ctx.arc(0, 0, wheelRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = '#00ffcc';
+            // Move Coins
+            coinItems.forEach((c, idx) => {
+                c.x -= 4;
+                if (Math.abs(c.x - hamster.x) < 20 && Math.abs(c.y - hamster.y) < 20) {
+                    coins += 1;
+                    energy = Math.min(100, energy + 10);
+                    coinItems.splice(idx, 1);
+                }
+            });
+
+            obstacles = obstacles.filter(o => o.x > -20);
+            coinItems = coinItems.filter(c => c.x > -20);
+
+            // Update UI
+            document.getElementById("uiDist").innerText = Math.floor(score) + " m";
+            document.getElementById("uiCoins").innerText = coins;
+            document.getElementById("uiEnergy").innerText = Math.max(0, Math.floor(energy)) + "%";
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Wheel Background
+            ctx.strokeStyle = "#162b42";
             ctx.lineWidth = 6;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#00ffcc';
-            ctx.stroke();
-
-            // Inner Tread
             ctx.beginPath();
-            ctx.arc(0, 0, wheelRadius - 10, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(0, 255, 204, 0.3)';
-            ctx.lineWidth = 2;
+            ctx.arc(200, 200, 160, 0, Math.PI * 2);
             ctx.stroke();
 
-            // Spokes
-            const numSpokes = 12;
-            for (let i = 0; i < numSpokes; i++) {
-                const angle = wheelAngle + (i * Math.PI * 2) / numSpokes;
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(Math.cos(angle) * (wheelRadius - 10), Math.sin(angle) * (wheelRadius - 10));
-                ctx.strokeStyle = 'rgba(0, 255, 204, 0.2)';
+            // Wheel Spokes
+            for (let i = 0; i < 8; i++) {
+                let ang = wheelAngle + (i * Math.PI / 4);
+                ctx.strokeStyle = "#0e1d2e";
                 ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(200, 200);
+                ctx.lineTo(200 + Math.cos(ang) * 160, 200 + Math.sin(ang) * 160);
                 ctx.stroke();
             }
 
-            ctx.restore();
-
-            // --- SPAWN & UPDATE OBSTACLES ---
-            spawnObstacle();
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obs = obstacles[i];
-                obs.angle -= wheelSpeed; // Moves relative to rotating wheel
-
-                // Calculate screen position
-                const obsX = centerX + Math.cos(obs.angle) * (wheelRadius - 15);
-                const obsY = centerY + Math.sin(obs.angle) * (wheelRadius - 15);
-
-                // Draw Red Energy Obstacle
-                ctx.fillStyle = '#ff0055';
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#ff0055';
-                ctx.beginPath();
-                ctx.arc(obsX, obsY, obs.size / 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Collision Detection with Hamster
-                const distToHamster = Math.hypot(obsX - hamster.x, obsY - hamster.y);
-                if (distToHamster < hamster.radius + obs.size / 2) {
-                    sounds.playHit();
-                    energy -= 25; // Lose energy on hit
-                    obstacles.splice(i, 1);
-                    if (energy <= 0) gameOver();
-                } else if (obs.angle < Math.PI / 2 - 0.8) {
-                    // Remove when off-screen
-                    obstacles.splice(i, 1);
-                }
-            }
-
-            // --- SPAWN & UPDATE SQK TOKENS ---
-            spawnToken();
-            for (let i = tokens.length - 1; i >= 0; i--) {
-                const tok = tokens[i];
-                tok.angle -= wheelSpeed;
-
-                const tokX = centerX + Math.cos(tok.angle) * (wheelRadius - tok.radiusOffset);
-                const tokY = centerY + Math.sin(tok.angle) * (wheelRadius - tok.radiusOffset);
-
-                // Draw Glowing Yellow Token
-                ctx.fillStyle = '#ffd700';
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = '#ffd700';
-                ctx.beginPath();
-                ctx.arc(tokX, tokY, 8, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Token symbol $
-                ctx.fillStyle = '#000';
-                ctx.font = '10px monospace';
-                ctx.fillText('S', tokX - 3, tokY + 3);
-
-                // Collision Detection with Token
-                const distToToken = Math.hypot(tokX - hamster.x, tokY - hamster.y);
-                if (distToToken < hamster.radius + 10) {
-                    sounds.playCoin();
-                    sqkTokens += 1;
-                    energy = Math.min(100, energy + 5); // Token restores energy
-                    tokens.splice(i, 1);
-                } else if (tok.angle < Math.PI / 2 - 0.8) {
-                    tokens.splice(i, 1);
-                }
-            }
-
-            // --- DRAW HAMSTER CHARACTER ---
-            ctx.save();
-            ctx.translate(hamster.x, hamster.y);
-
-            // Hamster Body
-            ctx.fillStyle = '#ffaa00';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ffaa00';
-            ctx.beginPath();
-            ctx.arc(0, 0, hamster.radius, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Hamster Ear
-            ctx.fillStyle = '#ff77aa';
-            ctx.beginPath();
-            ctx.arc(-8, -12, 5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Eye
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(6, -4, 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Animated Running Feet
-            const legOffset = Math.sin(hamster.animTimer * 0.5) * 6;
-            ctx.strokeStyle = '#d47a00';
+            // Track Ground
+            ctx.strokeStyle = "#00ffcc";
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(-6, 12);
-            ctx.lineTo(-6 + legOffset, 18);
-            ctx.moveTo(6, 12);
-            ctx.lineTo(6 - legOffset, 18);
+            ctx.arc(200, 200, 150, 0.25 * Math.PI, 0.75 * Math.PI);
             ctx.stroke();
 
-            ctx.restore();
+            if (gameState === "PLAYING") {
+                // Draw Hamster
+                ctx.fillStyle = "#ffb703";
+                ctx.beginPath();
+                ctx.arc(hamster.x, hamster.y, hamster.radius, 0, Math.PI * 2);
+                ctx.fill();
 
-            // --- DRAW HUD (HEADS UP DISPLAY) ---
-            ctx.shadowBlur = 0;
-            ctx.font = '16px "VT323", monospace';
-            ctx.fillStyle = '#00ffcc';
-            ctx.fillText(`DISTANCE: ${distance}m`, 20, 30);
+                // Draw Obstacles
+                ctx.fillStyle = "#ff007a";
+                obstacles.forEach(obs => {
+                    ctx.fillRect(obs.x, 270, obs.size, obs.size);
+                });
 
-            ctx.fillStyle = '#ffd700';
-            ctx.fillText(`$SQK: ${sqkTokens}`, 20, 55);
-
-            // Energy Bar
-            ctx.fillStyle = '#888';
-            ctx.fillRect(20, 70, 120, 10);
-            ctx.fillStyle = energy > 30 ? '#00ffcc' : '#ff0055';
-            ctx.fillRect(20, 70, (energy / 100) * 120, 10);
-
-            if (energy <= 0) {
-                gameOver();
-            } else {
-                animationFrameId = requestAnimationFrame(gameLoop);
+                // Draw Coins
+                ctx.fillStyle = "#00ffcc";
+                coinItems.forEach(c => {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 7, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (gameState === "START") {
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "12px 'Press Start 2P'";
+                ctx.textAlign = "center";
+                ctx.fillText("TAP / SPACE TO RUN", 200, 190);
+                ctx.fillStyle = "#00ffcc";
+                ctx.font = "8px 'Press Start 2P'";
+                ctx.fillText("KEEP THE WHEEL SPINNING!", 200, 220);
+            } else if (gameState === "GAMEOVER") {
+                ctx.fillStyle = "#ff007a";
+                ctx.font = "14px 'Press Start 2P'";
+                ctx.textAlign = "center";
+                ctx.fillText("EXHAUSTED!", 200, 180);
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "8px 'Press Start 2P'";
+                ctx.fillText("FINAL DISTANCE: " + Math.floor(score) + "m", 200, 210);
+                ctx.fillText("TAP TO TRY AGAIN", 200, 230);
             }
         }
 
-        // Start Game Handler
-        function startGame() {
-            sounds.init();
-            initGame();
-            document.getElementById('uiOverlay').classList.add('hidden');
-            isRunning = true;
-            gameLoop();
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
         }
 
-        // Game Over Handler
-        function gameOver() {
-            isRunning = false;
-            cancelAnimationFrame(animationFrameId);
-
-            const totalScore = distance + (sqkTokens * 50);
-            if (totalScore > highScore) {
-                highScore = totalScore;
-                localStorage.setItem('sqk_highscore', highScore);
-            }
-
-            document.getElementById('overlayTitle').innerText = 'RUN OVER!';
-            document.getElementById('overlayDesc').innerText = 'Your hamster exhausted its energy on the wheel.';
-            document.getElementById('finalDistance').innerText = `${distance}m`;
-            document.getElementById('finalTokens').innerText = sqkTokens;
-            document.getElementById('finalScore').innerText = totalScore;
-            
-            document.getElementById('scoreSummary').classList.remove('hidden');
-            document.getElementById('startBtn').innerText = 'TRY AGAIN';
-            document.getElementById('uiOverlay').classList.remove('hidden');
-        }
+        loop();
     </script>
 </body>
 </html>
-```
