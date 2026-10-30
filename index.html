@@ -36,7 +36,7 @@
 
         html, body {
             width: 100%;
-            height: 100%;
+            height: 100vh;
             background-color: var(--bg-base);
             color: var(--primary);
             font-family: var(--font-pixel);
@@ -50,13 +50,13 @@
             position: relative;
             z-index: 2;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             max-width: 480px;
-            max-height: 100vh;
+            max-height: 850px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 6px;
+            padding: 10px;
             background: var(--bg-panel);
             border: 2px solid var(--primary);
             box-shadow: var(--border-glow);
@@ -67,7 +67,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 10px;
+            padding: 8px 10px;
             background: var(--bg-card);
             border: 1px solid var(--primary);
             border-radius: 6px;
@@ -77,7 +77,7 @@
         .branding-group {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .branding-avatar {
@@ -121,12 +121,13 @@
         .viewport-wrapper {
             position: relative;
             width: 100%;
-            flex: 1;
-            margin: 4px 0;
+            flex: 1 1 auto;
+            margin: 8px 0;
             background: #000000;
             border: 2px solid var(--primary);
             border-radius: 6px;
             overflow: hidden;
+            min-height: 200px;
         }
 
         canvas#viewportCanvas {
@@ -148,7 +149,7 @@
         .stat-card {
             background: var(--bg-card);
             border: 1px solid rgba(0, 255, 204, 0.2);
-            padding: 5px 2px;
+            padding: 6px 2px;
             border-radius: 4px;
             text-align: center;
             display: flex;
@@ -174,18 +175,19 @@
         footer.arcade-footer {
             width: 100%;
             text-align: center;
-            font-size: 5px;
-            color: var(--text-dark);
+            font-size: 6px;
+            color: var(--text-muted);
             font-family: var(--font-mono);
-            margin-top: 2px;
+            margin-top: 6px;
             flex-shrink: 0;
+            line-height: 1.2;
         }
 
         @media (min-width: 768px) {
             .app-root {
-                max-width: 460px;
-                height: 92vh;
-                border-radius: 10px;
+                height: 90vh;
+                max-height: 750px;
+                border-radius: 12px;
             }
         }
     </style>
@@ -227,9 +229,9 @@
             </div>
         </div>
 
-        <arcade-footer class="arcade-footer">
+        <footer class="arcade-footer">
             DETERMINISTIC EXECUTION • TAP TO JUMP
-        </arcade-footer>
+        </footer>
     </div>
 
     <script>
