@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squeekchain Hamster Companion</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #00ffcc;
+            font-family: monospace;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .box {
+            border: 2px dashed #00ffcc;
+            display: inline-block;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        button {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Squeekchain Stream Companion</h1>
+        <p>Hamster Wheel Rotations: <span id="counter">0</span></p>
+        <button onclick="boostWheel()">Boost Wheel</button>
+    </div>
+
+    <script>
+        let count = 1042;
+        document.getElementById('counter').innerText = count;
+        function boostWheel() {
+            count += Math.floor(Math.random() * 5) + 1;
+            document.getElementById('counter').innerText = count;
+        }
+    </script>
+</body>
+</html>
