@@ -2,537 +2,188 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Squeekchain Genesis Companion - Wheel Protocol Runner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Squeekchain Simple Runner</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
-
-        :root {
-            --bg-base: #03060d;
-            --bg-panel: #0d1626;
-            --bg-card: #142036;
-            --primary: #00ffcc;
-            --secondary: #ff007a;
-            --accent-gold: #ffd700;
-            --text-bright: #ffffff;
-            --text-muted: #8fa0b5;
-            --font-pixel: 'Press Start 2P', monospace;
-            --font-mono: 'Share Tech Mono', monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
-            outline: none;
-        }
-
-        html, body {
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-base);
-            color: var(--primary);
-            font-family: var(--font-pixel);
-            overflow: hidden;
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body {
+            background: #03060d;
+            color: #00ffcc;
+            font-family: monospace;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-        }
-
-        .app-root {
-            position: relative;
-            width: 100vw;
             height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 400px;
+            height: 80vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 8px;
-            background: var(--bg-panel);
-            border: 2px solid var(--primary);
+            background: #0d1626;
+            border: 2px solid #00ffcc;
+            border-radius: 8px;
+            padding: 10px;
         }
-
-        header.arcade-header {
-            width: 100%;
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--primary);
-            border-radius: 6px;
-            flex-shrink: 0;
+            padding: 5px;
+            font-size: 10px;
+            border-bottom: 1px solid #1f3552;
+            margin-bottom: 8px;
         }
-
-        .branding-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .branding-avatar {
-            width: 20px;
-            height: 20px;
-            background: #ffb703;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-        }
-
-        .branding-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .branding-text .main-title {
-            font-size: 9px;
-            color: var(--text-bright);
-        }
-
-        .branding-text .sub-title {
-            font-size: 5px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            margin-top: 2px;
-        }
-
-        .btn-web3 {
-            background: linear-gradient(135deg, #ff007a, #990049);
-            color: var(--text-bright);
-            border: 1px solid #ff55a3;
-            padding: 6px 10px;
-            font-family: var(--font-pixel);
-            font-size: 7px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .viewport-wrapper {
-            position: relative;
-            width: 100%;
+        canvas {
             flex: 1;
-            margin: 6px 0;
-            background: #000000;
-            border: 2px solid var(--primary);
-            border-radius: 6px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        canvas#viewportCanvas {
-            width: 100%;
-            height: 100%;
+            background: #000;
+            border: 1px solid #00ffcc;
             display: block;
-        }
-
-        .dashboard-container {
             width: 100%;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            flex-shrink: 0;
         }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            padding: 6px 4px;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .stat-card .label {
-            font-size: 5px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            margin-bottom: 2px;
-        }
-
-        .stat-card .val {
-            font-size: 8px;
-            color: var(--primary);
-        }
-
-        footer.arcade-footer {
-            width: 100%;
-            text-align: center;
-            font-size: 5px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            margin-top: 4px;
-            flex-shrink: 0;
-        }
-
-        @media (min-width: 768px) {
-            .app-root {
-                max-width: 500px;
-                height: 92vh;
-                border-radius: 10px;
-            }
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 9px;
+            color: #8fa0b5;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-root">
-        <header class="arcade-header">
-            <div class="branding-group">
-                <div class="branding-avatar"></div>
-                <div class="branding-text">
-                    <span class="main-title">SQUEEKCHAIN</span>
-                    <span class="sub-title">WHEEL RUNNER v3.0</span>
-                </div>
-            </div>
-            <button class="btn-web3" id="walletConnectBtn">CONNECT WALLET</button>
+    <div class="game-container">
+        <header>
+            <span>SQUEEK RUNNER</span>
+            <span id="scoreText">SCORE: 0</span>
         </header>
-
-        <div class="viewport-wrapper" id="viewportWrapper">
-            <canvas id="viewportCanvas"></canvas>
+        <canvas id="cvs"></canvas>
+        <div class="footer-info">
+            <span>TAP TO JUMP</span>
+            <span style="color: #ffd700;" id="tokenText">SQK: 0</span>
         </div>
-
-        <div class="dashboard-container">
-            <div class="stat-card">
-                <div class="label">STAGE</div>
-                <div class="val" id="hudStage">1: CYBER</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">DISTANCE</div>
-                <div class="val" id="hudDist">0m</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">ENERGY</div>
-                <div class="val" id="hudEnergy">100%</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">$SQK TOKEN</div>
-                <div class="val" id="hudTokens" style="color: var(--accent-gold);">1250</div>
-            </div>
-        </div>
-
-        <footer class="arcade-footer">
-            DETERMINISTIC EXECUTION • TAP OR SPACE TO JUMP
-        </footer>
     </div>
 
     <script>
-        class AudioEngine {
-            constructor() { this.ctx = null; }
-            init() {
-                if (!this.ctx) {
-                    const AC = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AC();
-                }
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-            }
-            playTone(freq, type = 'sine', duration = 0.1, volume = 0.1) {
-                try {
-                    this.init();
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                    gain.gain.setValueAtTime(volume, this.ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start();
-                    osc.stop(this.ctx.currentTime + duration);
-                } catch (e) {}
-            }
-            playJump() { this.playTone(350, 'sine', 0.08, 0.08); }
-            playCoin() { this.playTone(880, 'square', 0.08, 0.05); }
-            playHit() { this.playTone(120, 'sawtooth', 0.2, 0.12); }
-            playOver() { this.playTone(200, 'sawtooth', 0.3, 0.1); }
+        const canvas = document.getElementById("cvs");
+        const ctx = canvas.getContext("2d");
+
+        function resize() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let player = { x: 50, y: 150, r: 12, vy: 0, gravity: 0.5, jump: -8, grounded: false };
+        let obstacles = [];
+        let score = 0;
+        let tokens = 0;
+        let isOver = false;
+
+        function reset() {
+            player.y = canvas.height / 2;
+            player.vy = 0;
+            obstacles = [];
+            score = 0;
+            tokens = 0;
+            isOver = false;
         }
 
-        class Web3Bridge {
-            constructor(cb) {
-                this.address = null;
-                this.cb = cb;
-                document.getElementById('walletConnectBtn').addEventListener('click', () => this.connect());
-            }
-            async connect() {
-                if (window.ethereum) {
-                    try {
-                        const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        this.address = accs[0];
-                        this.updateUI();
-                        if (this.cb) this.cb();
-                    } catch (e) {}
-                } else {
-                    this.address = "0x" + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
-                    this.updateUI();
-                    if (this.cb) this.cb();
-                }
-            }
-            updateUI() {
-                if (this.address) {
-                    const btn = document.getElementById('walletConnectBtn');
-                    btn.innerText = `${this.address.substring(0, 4)}...${this.address.substring(38)}`;
-                    btn.style.background = "linear-gradient(135deg, #00ffcc, #008866)";
-                    btn.style.color = "#03060d";
-                }
+        function triggerJump() {
+            if (isOver) {
+                reset();
+            } else if (player.grounded) {
+                player.vy = player.jump;
+                player.grounded = false;
             }
         }
 
-        class GameEngine {
-            constructor() {
-                this.canvas = document.getElementById('viewportCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.wrapper = document.getElementById('viewportWrapper');
+        window.addEventListener('keydown', e => { if (e.code === 'Space') triggerJump(); });
+        canvas.addEventListener('click', triggerJump);
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); triggerJump(); });
 
-                this.audio = new AudioEngine();
-                this.web3 = new Web3Bridge(() => this.syncHUD());
+        let frame = 0;
+        function loop() {
+            frame++;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                this.state = "START";
-                this.distance = 0;
-                this.coins = 0;
-                this.energy = 100;
-                this.stage = 1;
-                this.frame = 0;
-                this.wheelAngle = 0;
+            let groundY = canvas.height - 30;
 
-                // Physics Controls - Precise Jump Limit
-                this.jumpOffset = 0;
-                this.jumpVy = 0;
-                this.isJumping = false;
+            // Physics
+            if (!isOver) {
+                player.vy += player.gravity;
+                player.y += player.vy;
 
-                this.obstacles = [];
-                this.tokens = [];
-
-                this.initListeners();
-                this.resize();
-                this.loop = this.loop.bind(this);
-                requestAnimationFrame(this.loop);
-            }
-
-            initListeners() {
-                window.addEventListener('resize', () => this.resize());
-
-                const trigger = (e) => {
-                    if (e.target.tagName === 'BUTTON') return;
-                    if (e.type === 'touchstart') e.preventDefault();
-                    this.audio.init();
-
-                    if (this.state === "START" || this.state === "GAMEOVER") {
-                        this.reset();
-                        this.state = "PLAYING";
-                    } else if (this.state === "PLAYING" && !this.isJumping) {
-                        this.isJumping = true;
-                        this.jumpVy = 3.2; // Perfectly scaled jump inside track
-                        this.audio.playJump();
-                    }
-                };
-
-                window.addEventListener('keydown', (e) => { if (e.code === 'Space') trigger(e); });
-                this.wrapper.addEventListener('touchstart', trigger, { passive: false });
-                this.wrapper.addEventListener('click', trigger);
-            }
-
-            resize() {
-                this.canvas.width = this.wrapper.clientWidth;
-                this.canvas.height = this.wrapper.clientHeight;
-            }
-
-            reset() {
-                this.distance = 0;
-                this.coins = 0;
-                this.energy = 100;
-                this.stage = 1;
-                this.frame = 0;
-                this.wheelAngle = 0;
-                this.jumpOffset = 0;
-                this.jumpVy = 0;
-                this.isJumping = false;
-                this.obstacles = [];
-                this.tokens = [];
-                this.syncHUD();
-            }
-
-            syncHUD() {
-                document.getElementById('hudDist').innerText = `${Math.floor(this.distance)}m`;
-                document.getElementById('hudEnergy').innerText = `${Math.max(0, Math.floor(this.energy))}%`;
-                document.getElementById('hudTokens').innerText = 1250 + (this.coins * 10);
-
-                if (this.distance < 100) {
-                    this.stage = 1;
-                    document.getElementById('hudStage').innerText = "1: CYBER";
-                    document.getElementById('hudStage').style.color = "#00ffcc";
-                } else if (this.distance < 250) {
-                    this.stage = 2;
-                    document.getElementById('hudStage').innerText = "2: WHEEL";
-                    document.getElementById('hudStage').style.color = "#ffd700";
-                } else {
-                    this.stage = 3;
-                    document.getElementById('hudStage').innerText = "3: CORE";
-                    document.getElementById('hudStage').style.color = "#ff007a";
-                }
-            }
-
-            update() {
-                if (this.state !== "PLAYING") return;
-
-                this.frame++;
-                this.distance += 0.1;
-                this.energy -= 0.02;
-                const rotationSpeed = 0.02 + (this.stage * 0.003);
-                this.wheelAngle += rotationSpeed;
-
-                if (this.energy <= 0) {
-                    this.state = "GAMEOVER";
-                    this.audio.playOver();
+                if (player.y >= groundY - player.r) {
+                    player.y = groundY - player.r;
+                    player.vy = 0;
+                    player.grounded = true;
                 }
 
-                // Strict Bound Jump Dynamics
-                if (this.isJumping) {
-                    this.jumpOffset += this.jumpVy;
-                    this.jumpVy -= 0.22; // Gravity towards track
-                    if (this.jumpOffset <= 0) {
-                        this.jumpOffset = 0;
-                        this.isJumping = false;
-                    }
+                if (frame % 90 === 0) {
+                    obstacles.push({ x: canvas.width, w: 15, h: 25, type: Math.random() > 0.5 ? 'obs' : 'coin' });
                 }
 
-                // Spawns
-                if (this.frame % 120 === 0) {
-                    this.obstacles.push({ angle: Math.PI * 0.2 });
-                }
-                if (this.frame % 150 === 0) {
-                    this.tokens.push({ angle: Math.PI * 0.35 });
-                }
-
-                const hamsterTargetAngle = Math.PI * 0.72; // Left bottom arc position
-
-                // Accurate Collision Checking
-                this.obstacles.forEach((obs, idx) => {
-                    obs.angle -= rotationSpeed;
-                    if (Math.abs(obs.angle - hamsterTargetAngle) < 0.06) {
-                        if (this.jumpOffset < 8) { // Hit if not jumped
-                            this.energy -= 16;
-                            this.audio.playHit();
-                            this.obstacles.splice(idx, 1);
+                obstacles.forEach(o => {
+                    o.x -= 3;
+                    // Collision
+                    if (Math.abs(o.x - player.x) < 20) {
+                        if (o.type === 'obs' && player.y + player.r >= groundY - o.h) {
+                            isOver = true;
+                        } else if (o.type === 'coin' && Math.abs((groundY - o.h/2) - player.y) < 25) {
+                            tokens += 5;
+                            o.x = -100; // remove
                         }
                     }
                 });
 
-                this.tokens.forEach((token, idx) => {
-                    token.angle -= rotationSpeed;
-                    if (Math.abs(token.angle - hamsterTargetAngle) < 0.08) {
-                        this.coins++;
-                        this.energy = Math.min(100, this.energy + 10);
-                        this.audio.playCoin();
-                        this.tokens.splice(idx, 1);
-                    }
-                });
-
-                this.obstacles = this.obstacles.filter(o => o.angle > 0);
-                this.tokens = this.tokens.filter(t => t.angle > 0);
-
-                this.syncHUD();
+                obstacles = obstacles.filter(o => o.x > -30);
+                score++;
             }
 
-            draw() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            // Draw Ground
+            ctx.fillStyle = "#ff007a";
+            ctx.fillRect(0, groundY, canvas.width, 4);
 
-                const cx = this.canvas.width / 2;
-                const cy = this.canvas.height / 2;
-                const radius = Math.min(this.canvas.width, this.canvas.height) * 0.42;
+            // Draw Player
+            ctx.fillStyle = "#ffb703";
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+            ctx.fill();
 
-                let colorTheme = "#00ffcc";
-                if (this.stage === 2) colorTheme = "#ffd700";
-                if (this.stage === 3) colorTheme = "#ff007a";
-
-                // Outer Wheel
-                this.ctx.strokeStyle = colorTheme;
-                this.ctx.lineWidth = 3;
-                this.ctx.beginPath();
-                this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-                this.ctx.stroke();
-
-                // Spokes
-                for (let i = 0; i < 8; i++) {
-                    let ang = this.wheelAngle + (i * Math.PI / 4);
-                    this.ctx.strokeStyle = "rgba(22, 43, 66, 0.6)";
-                    this.ctx.lineWidth = 1.5;
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(cx, cy);
-                    this.ctx.lineTo(cx + Math.cos(ang) * radius, cy + Math.sin(ang) * radius);
-                    this.ctx.stroke();
+            // Draw Obstacles & Coins
+            obstacles.forEach(o => {
+                if (o.type === 'obs') {
+                    ctx.fillStyle = "#ff0055";
+                    ctx.fillRect(o.x, groundY - o.h, o.w, o.h);
+                } else {
+                    ctx.fillStyle = "#ffd700";
+                    ctx.beginPath();
+                    ctx.arc(o.x, groundY - 15, 7, 0, Math.PI * 2);
+                    ctx.fill();
                 }
+            });
 
-                // Red Track Arc
-                this.ctx.strokeStyle = "#ff007a";
-                this.ctx.lineWidth = 4;
-                this.ctx.beginPath();
-                this.ctx.arc(cx, cy, radius - 4, 0.2 * Math.PI, 0.8 * Math.PI);
-                this.ctx.stroke();
+            // UI
+            document.getElementById("scoreText").innerText = "SCORE: " + Math.floor(score/10);
+            document.getElementById("tokenText").innerText = "SQK: " + tokens;
 
-                if (this.state === "PLAYING") {
-                    const trackRadius = radius - 12;
-
-                    // Obstacles
-                    this.ctx.fillStyle = "#ff0055";
-                    this.obstacles.forEach(obs => {
-                        let ox = cx + Math.cos(obs.angle) * trackRadius;
-                        let oy = cy + Math.sin(obs.angle) * trackRadius;
-                        this.ctx.fillRect(ox - 6, oy - 6, 12, 12);
-                    });
-
-                    // Tokens
-                    this.ctx.fillStyle = "#ffd700";
-                    this.tokens.forEach(t => {
-                        let tx = cx + Math.cos(t.angle) * trackRadius;
-                        let ty = cy + Math.sin(t.angle) * trackRadius;
-                        this.ctx.beginPath();
-                        this.ctx.arc(tx, ty, 5, 0, Math.PI * 2);
-                        this.ctx.fill();
-                    });
-
-                    // Hamster on Track with constrained jump
-                    const hamsterAngle = Math.PI * 0.72;
-                    const currentRadius = trackRadius - this.jumpOffset;
-                    let hx = cx + Math.cos(hamsterAngle) * currentRadius;
-                    let hy = cy + Math.sin(hamsterAngle) * currentRadius;
-
-                    this.ctx.fillStyle = "#ffb703";
-                    this.ctx.beginPath();
-                    this.ctx.arc(hx, hy, 10, 0, Math.PI * 2);
-                    this.ctx.fill();
-
-                } else if (this.state === "START") {
-                    this.ctx.fillStyle = "#ffffff";
-                    this.ctx.font = "10px 'Press Start 2P'";
-                    this.ctx.textAlign = "center";
-                    this.ctx.fillText("TAP TO START", cx, cy - 10);
-
-                    this.ctx.fillStyle = colorTheme;
-                    this.ctx.font = "6px 'Press Start 2P'";
-                    this.ctx.fillText("RUN INSIDE WHEEL", cx, cy + 15);
-                } else if (this.state === "GAMEOVER") {
-                    this.ctx.fillStyle = "#ff007a";
-                    this.ctx.font = "11px 'Press Start 2P'";
-                    this.ctx.textAlign = "center";
-                    this.ctx.fillText("RUN OVER!", cx, cy - 18);
-
-                    this.ctx.fillStyle = "#ffffff";
-                    this.ctx.font = "6px 'Press Start 2P'";
-                    this.ctx.fillText(`DIST: ${Math.floor(this.distance)}m | EARNED: +${this.coins * 10} SQK`, cx, cy + 4);
-                    this.ctx.fillText("TAP TO RESTART", cx, cy + 22);
-                }
+            if (isOver) {
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "12px monospace";
+                ctx.textAlign = "center";
+                ctx.fillText("GAME OVER - TAP TO RESTART", canvas.width / 2, canvas.height / 2);
             }
 
-            loop() {
-                this.update();
-                this.draw();
-                requestAnimationFrame(this.loop);
-            }
+            requestAnimationFrame(loop);
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            window.appEngine = new GameEngine();
-        });
+        loop();
     </script>
 </body>
 </html>
