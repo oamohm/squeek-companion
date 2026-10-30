@@ -14,70 +14,64 @@
             padding: 0;
         }
 
-        html, body {
-            width: 100%;
-            height: 100vh;
+        body {
             background-color: #050811;
             color: #00ffcc;
             font-family: 'Press Start 2P', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-        }
-
-        .main-container {
-            width: 100%;
-            max-width: 500px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            background: #0d1322;
-            border: 2px solid #00ffcc;
+            min-height: 100vh;
             padding: 10px;
         }
 
-        header {
+        .main-card {
             width: 100%;
-            height: 45px;
+            max-width: 420px;
+            background: #0d1322;
+            border: 2px solid #00ffcc;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 10px;
+            padding: 8px;
             background: #162035;
-            border: 2px solid #00ffcc;
+            border: 1px solid #00ffcc;
             border-radius: 6px;
-            flex-shrink: 0;
         }
 
         .title {
             font-size: 9px;
             color: #ffffff;
-            text-shadow: 0 0 5px #00ffcc;
         }
 
         .btn-wallet {
             background: #ff007a;
             color: #ffffff;
             border: none;
-            padding: 6px 10px;
+            padding: 6px 8px;
             font-family: inherit;
             font-size: 8px;
             cursor: pointer;
             border-radius: 4px;
         }
 
-        .game-wrapper {
+        .game-box {
             width: 100%;
-            flex: 1;
-            margin: 8px 0;
+            height: 320px;
             background: #02040a;
             border: 2px solid #1a2a40;
             border-radius: 8px;
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
         }
 
         canvas {
@@ -86,15 +80,13 @@
             display: block;
         }
 
-        .wallet-dashboard {
-            width: 100%;
+        .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-            flex-shrink: 0;
         }
 
-        .stat-box {
+        .stat-card {
             background: #162035;
             border: 1px solid #00ffcc33;
             padding: 8px;
@@ -114,67 +106,48 @@
         }
 
         footer {
-            height: 20px;
-            font-size: 6px;
+            font-size: 7px;
             color: #5d738e;
             text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        @media (min-width: 768px) {
-            .main-container {
-                height: 90vh;
-                border-radius: 12px;
-                box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
-            }
         }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
+    <div class="main-card">
         <header>
             <div class="title">🐹 FLAPPY SQUEEK</div>
             <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">CONNECT WALLET</button>
         </header>
 
-        <div class="game-wrapper" id="canvasWrapper">
-            <canvas id="gameCanvas"></canvas>
+        <div class="game-box" id="gameBox">
+            <canvas id="gameCanvas" width="360" height="320"></canvas>
         </div>
 
-        <div class="wallet-dashboard">
-            <div class="stat-box">
+        <div class="dashboard">
+            <div class="stat-card">
                 <div class="stat-label">WALLET BAL</div>
                 <div class="stat-value" id="uiBalance">0 $SQK</div>
             </div>
-            <div class="stat-box">
+            <div class="stat-card">
                 <div class="stat-label">EARNED (RUN)</div>
                 <div class="stat-value" id="uiEarned">0 $SQK</div>
             </div>
         </div>
 
-        <footer>TAP TO FLAP • EARN $SQK TOKENS</footer>
+        <footer>TAP / SPACE TO FLAP • COLLECT $SQK</footer>
     </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        const wrapper = document.getElementById("canvasWrapper");
-
-        function resizeCanvas() {
-            canvas.width = wrapper.clientWidth;
-            canvas.height = wrapper.clientHeight;
-        }
 
         let gameState = "START";
         let score = 0;
         let earnedSqk = 0;
         let totalWalletBalance = 0;
 
-        let hamster = { x: 50, y: 200, vy: 0, radius: 12 };
+        let hamster = { x: 50, y: 150, vy: 0, radius: 10 };
         let pipes = [];
         let coins = [];
         let frame = 0;
@@ -202,7 +175,7 @@
                 resetGame();
                 gameState = "PLAYING";
             } else if (gameState === "PLAYING") {
-                hamster.vy = -5.5;
+                hamster.vy = -5;
             }
         }
 
@@ -213,7 +186,7 @@
         function resetGame() {
             score = 0;
             earnedSqk = 0;
-            hamster.y = canvas.height / 2;
+            hamster.y = 150;
             hamster.vy = 0;
             pipes = [];
             coins = [];
@@ -228,25 +201,27 @@
             hamster.vy += 0.3;
             hamster.y += hamster.vy;
 
-            if (hamster.y + hamster.radius >= canvas.height - 12 || hamster.y - hamster.radius <= 0) {
+            // Collision with Ground & Top
+            if (hamster.y + hamster.radius >= canvas.height - 10 || hamster.y - hamster.radius <= 0) {
                 endGame();
             }
 
-            if (frame % 100 === 0) {
-                let gap = 110;
-                let topH = Math.floor(Math.random() * (canvas.height - gap - 80)) + 30;
+            // Spawn Pipes & Coins
+            if (frame % 90 === 0) {
+                let gap = 100;
+                let topH = Math.floor(Math.random() * (canvas.height - gap - 60)) + 20;
                 pipes.push({ x: canvas.width, top: topH, bottom: topH + gap, passed: false });
-                coins.push({ x: canvas.width + 18, y: topH + (gap / 2), collected: false });
+                coins.push({ x: canvas.width + 15, y: topH + (gap / 2), collected: false });
             }
 
             pipes.forEach(p => {
                 p.x -= 2;
-                if (hamster.x + hamster.radius > p.x && hamster.x - hamster.radius < p.x + 35) {
+                if (hamster.x + hamster.radius > p.x && hamster.x - hamster.radius < p.x + 30) {
                     if (hamster.y - hamster.radius < p.top || hamster.y + hamster.radius > p.bottom) {
                         endGame();
                     }
                 }
-                if (p.x + 35 < hamster.x && !p.passed) {
+                if (p.x + 30 < hamster.x && !p.passed) {
                     score++;
                     earnedSqk += 5;
                     p.passed = true;
@@ -256,15 +231,15 @@
 
             coins.forEach(c => {
                 c.x -= 2;
-                if (!c.collected && Math.abs(c.x - hamster.x) < 20 && Math.abs(c.y - hamster.y) < 20) {
+                if (!c.collected && Math.abs(c.x - hamster.x) < 18 && Math.abs(c.y - hamster.y) < 18) {
                     c.collected = true;
                     earnedSqk += 10;
                     updateUI();
                 }
             });
 
-            pipes = pipes.filter(p => p.x > -40);
-            coins = coins.filter(c => c.x > -40);
+            pipes = pipes.filter(p => p.x > -35);
+            coins = coins.filter(c => c.x > -35);
         }
 
         function endGame() {
@@ -278,20 +253,20 @@
 
             // Ground
             ctx.fillStyle = "#00ffcc";
-            ctx.fillRect(0, canvas.height - 12, canvas.width, 12);
+            ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
 
             if (gameState === "PLAYING" || gameState === "GAMEOVER") {
                 pipes.forEach(p => {
                     ctx.fillStyle = "#ff007a";
-                    ctx.fillRect(p.x, 0, 35, p.top);
-                    ctx.fillRect(p.x, p.bottom, 35, canvas.height - p.bottom - 12);
+                    ctx.fillRect(p.x, 0, 30, p.top);
+                    ctx.fillRect(p.x, p.bottom, 30, canvas.height - p.bottom - 10);
                 });
 
                 coins.forEach(c => {
                     if (!c.collected) {
                         ctx.fillStyle = "#ffd700";
                         ctx.beginPath();
-                        ctx.arc(c.x, c.y, 7, 0, Math.PI * 2);
+                        ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
@@ -304,7 +279,7 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.font = "12px 'Press Start 2P'";
                 ctx.textAlign = "center";
-                ctx.fillText(score, canvas.width / 2, 35);
+                ctx.fillText(score, canvas.width / 2, 30);
             }
 
             if (gameState === "START") {
@@ -322,9 +297,9 @@
                 ctx.fillText("RUN OVER", canvas.width / 2, canvas.height / 2 - 20);
                 ctx.fillStyle = "#ffffff";
                 ctx.font = "8px 'Press Start 2P'";
-                ctx.fillText("SCORE: " + score, canvas.width / 2, canvas.height / 2 + 10);
-                ctx.fillText("EARNED: +" + earnedSqk + " $SQK", canvas.width / 2, canvas.height / 2 + 28);
-                ctx.fillText("TAP TO RESTART", canvas.width / 2, canvas.height / 2 + 50);
+                ctx.fillText("SCORE: " + score, canvas.width / 2, canvas.height / 2 + 5);
+                ctx.fillText("EARNED: +" + earnedSqk + " $SQK", canvas.width / 2, canvas.height / 2 + 22);
+                ctx.fillText("TAP TO RESTART", canvas.width / 2, canvas.height / 2 + 45);
             }
         }
 
@@ -334,8 +309,6 @@
             requestAnimationFrame(loop);
         }
 
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
         loop();
     </script>
 </body>
