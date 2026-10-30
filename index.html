@@ -14,44 +14,42 @@
             padding: 0;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            height: 100vh;
             background-color: #050811;
             color: #00ffcc;
             font-family: 'Press Start 2P', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            width: 100vw;
-            padding: 10px;
             overflow: hidden;
         }
 
         .main-container {
             width: 100%;
-            max-width: 480px;
-            height: 95vh;
-            max-height: 800px;
+            max-width: 500px;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             background: #0d1322;
-            border: 3px solid #00ffcc;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.25);
+            border: 2px solid #00ffcc;
+            padding: 10px;
         }
 
         header {
             width: 100%;
+            height: 45px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 10px;
+            padding: 0 10px;
             background: #162035;
             border: 2px solid #00ffcc;
             border-radius: 6px;
+            flex-shrink: 0;
         }
 
         .title {
@@ -64,23 +62,22 @@
             background: #ff007a;
             color: #ffffff;
             border: none;
-            padding: 8px 10px;
+            padding: 6px 10px;
             font-family: inherit;
             font-size: 8px;
             cursor: pointer;
             border-radius: 4px;
-            box-shadow: 0 0 8px rgba(255, 0, 122, 0.4);
         }
 
         .game-wrapper {
-            position: relative;
             width: 100%;
-            flex-grow: 1;
-            margin: 10px 0;
+            flex: 1;
+            margin: 8px 0;
             background: #02040a;
             border: 2px solid #1a2a40;
             border-radius: 8px;
             overflow: hidden;
+            position: relative;
         }
 
         canvas {
@@ -94,6 +91,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .stat-box {
@@ -111,15 +109,27 @@
         }
 
         .stat-value {
-            font-size: 10px;
+            font-size: 9px;
             color: #00ffcc;
         }
 
         footer {
-            margin-top: 6px;
-            font-size: 7px;
+            height: 20px;
+            font-size: 6px;
             color: #5d738e;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                height: 90vh;
+                border-radius: 12px;
+                box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
+            }
         }
     </style>
 </head>
@@ -131,13 +141,13 @@
             <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">CONNECT WALLET</button>
         </header>
 
-        <div class="game-wrapper">
+        <div class="game-wrapper" id="canvasWrapper">
             <canvas id="gameCanvas"></canvas>
         </div>
 
         <div class="wallet-dashboard">
             <div class="stat-box">
-                <div class="stat-label">WALLETS BAL</div>
+                <div class="stat-label">WALLET BAL</div>
                 <div class="stat-value" id="uiBalance">0 $SQK</div>
             </div>
             <div class="stat-box">
@@ -146,24 +156,23 @@
             </div>
         </div>
 
-        <footer>PRESS SPACE / TAP TO FLAP • EARN $SQK</footer>
+        <footer>TAP TO FLAP • EARN $SQK TOKENS</footer>
     </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const wrapper = document.getElementById("canvasWrapper");
 
         function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
         }
-        window.addEventListener('resize', resizeCanvas);
 
         let gameState = "START";
         let score = 0;
         let earnedSqk = 0;
         let totalWalletBalance = 0;
-        let walletAddress = null;
 
         let hamster = { x: 50, y: 200, vy: 0, radius: 12 };
         let pipes = [];
@@ -173,9 +182,9 @@
         function connectWallet() {
             if (window.ethereum) {
                 window.ethereum.request({ method: 'eth_requestAccounts' }).then(accs => {
-                    walletAddress = accs[0];
-                    document.getElementById("walletBtn").innerText = walletAddress.substring(0, 4) + "..." + walletAddress.substring(38);
-                    totalWalletBalance = 1250; // Initial On-Chain mock balance
+                    let addr = accs[0];
+                    document.getElementById("walletBtn").innerText = addr.substring(0, 4) + "..." + addr.substring(38);
+                    totalWalletBalance = 1250;
                     updateUI();
                 });
             } else {
@@ -219,20 +228,17 @@
             hamster.vy += 0.3;
             hamster.y += hamster.vy;
 
-            // Ground & Top collision
-            if (hamster.y + hamster.radius >= canvas.height - 15 || hamster.y - hamster.radius <= 0) {
+            if (hamster.y + hamster.radius >= canvas.height - 12 || hamster.y - hamster.radius <= 0) {
                 endGame();
             }
 
-            // Spawn Pipes & Coins
             if (frame % 100 === 0) {
                 let gap = 110;
-                let topH = Math.floor(Math.random() * (canvas.height - gap - 100)) + 40;
+                let topH = Math.floor(Math.random() * (canvas.height - gap - 80)) + 30;
                 pipes.push({ x: canvas.width, top: topH, bottom: topH + gap, passed: false });
-                coins.push({ x: canvas.width + 20, y: topH + (gap / 2), collected: false });
+                coins.push({ x: canvas.width + 18, y: topH + (gap / 2), collected: false });
             }
 
-            // Pipes Movement & Collision
             pipes.forEach(p => {
                 p.x -= 2;
                 if (hamster.x + hamster.radius > p.x && hamster.x - hamster.radius < p.x + 35) {
@@ -242,18 +248,17 @@
                 }
                 if (p.x + 35 < hamster.x && !p.passed) {
                     score++;
-                    earnedSqk += 5; // 5 SQK per obstacle
+                    earnedSqk += 5;
                     p.passed = true;
                     updateUI();
                 }
             });
 
-            // Coins Movement & Collection
             coins.forEach(c => {
                 c.x -= 2;
                 if (!c.collected && Math.abs(c.x - hamster.x) < 20 && Math.abs(c.y - hamster.y) < 20) {
                     c.collected = true;
-                    earnedSqk += 10; // 10 SQK per Coin
+                    earnedSqk += 10;
                     updateUI();
                 }
             });
@@ -271,19 +276,17 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Ground Track
+            // Ground
             ctx.fillStyle = "#00ffcc";
-            ctx.fillRect(0, canvas.height - 15, canvas.width, 15);
+            ctx.fillRect(0, canvas.height - 12, canvas.width, 12);
 
             if (gameState === "PLAYING" || gameState === "GAMEOVER") {
-                // Pipes
                 pipes.forEach(p => {
                     ctx.fillStyle = "#ff007a";
                     ctx.fillRect(p.x, 0, 35, p.top);
-                    ctx.fillRect(p.x, p.bottom, 35, canvas.height - p.bottom - 15);
+                    ctx.fillRect(p.x, p.bottom, 35, canvas.height - p.bottom - 12);
                 });
 
-                // Coins
                 coins.forEach(c => {
                     if (!c.collected) {
                         ctx.fillStyle = "#ffd700";
@@ -293,17 +296,15 @@
                     }
                 });
 
-                // Hamster
                 ctx.fillStyle = "#ffb703";
                 ctx.beginPath();
                 ctx.arc(hamster.x, hamster.y, hamster.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Score Display
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "14px 'Press Start 2P'";
+                ctx.font = "12px 'Press Start 2P'";
                 ctx.textAlign = "center";
-                ctx.fillText(score, canvas.width / 2, 40);
+                ctx.fillText(score, canvas.width / 2, 35);
             }
 
             if (gameState === "START") {
@@ -313,7 +314,7 @@
                 ctx.fillText("TAP TO START", canvas.width / 2, canvas.height / 2 - 10);
                 ctx.fillStyle = "#00ffcc";
                 ctx.font = "7px 'Press Start 2P'";
-                ctx.fillText("COLLECT $SQK COINS", canvas.width / 2, canvas.height / 2 + 15);
+                ctx.fillText("COLLECT $SQK TOKENS", canvas.width / 2, canvas.height / 2 + 15);
             } else if (gameState === "GAMEOVER") {
                 ctx.fillStyle = "#ff007a";
                 ctx.font = "12px 'Press Start 2P'";
@@ -322,8 +323,8 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.font = "8px 'Press Start 2P'";
                 ctx.fillText("SCORE: " + score, canvas.width / 2, canvas.height / 2 + 10);
-                ctx.fillText("EARNED: +" + earnedSqk + " $SQK", canvas.width / 2, canvas.height / 2 + 30);
-                ctx.fillText("TAP TO RESTART", canvas.width / 2, canvas.height / 2 + 55);
+                ctx.fillText("EARNED: +" + earnedSqk + " $SQK", canvas.width / 2, canvas.height / 2 + 28);
+                ctx.fillText("TAP TO RESTART", canvas.width / 2, canvas.height / 2 + 50);
             }
         }
 
@@ -333,6 +334,7 @@
             requestAnimationFrame(loop);
         }
 
+        window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         loop();
     </script>
